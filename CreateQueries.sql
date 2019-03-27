@@ -1,5 +1,5 @@
 CREATE TABLE User(
-	username varchar(50),
+	username varchar(20),
 	password varchar(50),
 	PRIMARY KEY(username)
 );
@@ -12,7 +12,8 @@ CREATE TABLE Person(
     avatar VARCHAR(2048),
     bio VARCHAR(1024),
     isPrivate Boolean,
-    PRIMARY KEY (username)
+    PRIMARY KEY (username),
+    FOREIGN KEY (username) REFERENCES User(username)
 );
 
 CREATE TABLE Photo(
