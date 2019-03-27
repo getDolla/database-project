@@ -7,10 +7,10 @@ app = Flask(__name__)
 
 #Configure MySQL
 conn = pymysql.connect(host='localhost',
-                       port = 8889,
+                       port = 3306,
                        user='root',
-                       password='root',
-                       db='DBproject',
+                       #password='root',
+                       db='dbproject',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
 
