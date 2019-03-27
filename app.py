@@ -10,7 +10,7 @@ conn = pymysql.connect(host='localhost',
                        port = 3306,
                        user='root',
                        #password='root',
-                       db='dbproject',
+                       db='finstagram',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
 
@@ -39,7 +39,7 @@ def loginAuth():
     #cursor used to send queries
     cursor = conn.cursor()
     #executes query
-    query = 'SELECT * FROM user WHERE username = %s and password = %s'
+    query = 'SELECT * FROM User WHERE username = %s and password = %s'
     cursor.execute(query, (username, password))
     #stores the results in a variable
     data = cursor.fetchone()
@@ -66,7 +66,7 @@ def registerAuth():
     #cursor used to send queries
     cursor = conn.cursor()
     #executes query
-    query = 'SELECT * FROM user WHERE username = %s'
+    query = 'SELECT * FROM User WHERE username = %s'
     cursor.execute(query, (username))
     #stores the results in a variable
     data = cursor.fetchone()
@@ -77,7 +77,7 @@ def registerAuth():
         error = "This user already exists"
         return render_template('register.html', error = error)
     else:
-        ins = 'INSERT INTO user VALUES(%s, %s)'
+        ins = 'INSERT INTO User VALUES(%s, %s)'
         cursor.execute(ins, (username, password))
         conn.commit()
         cursor.close()
