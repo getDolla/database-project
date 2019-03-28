@@ -90,7 +90,7 @@ def registerAuth():
 def home():
     user = session['username']
     cursor = conn.cursor();
-    query = 'SELECT ts, blog_post FROM blog WHERE username = %s ORDER BY ts DESC'
+    query = 'SELECT timestamp, filePath, caption FROM Photo WHERE photoOwner = %s ORDER BY timestamp DESC'
     cursor.execute(query, (user))
     data = cursor.fetchall()
     cursor.close()
