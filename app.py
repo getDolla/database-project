@@ -155,8 +155,22 @@ def show_posts():
 
 @app.route('/send_follow', methods = ["GET", "POST"])
 def send_follow():
-    #loads friends page with requests to user, allows user to send req to others
-    return render_template('send_follow_req.html')
+    #reloads page but sends follow to user specified
+    username = session['username']
+    toFollow = request.form['toFollow']
+    acceptedfol = False
+    cursor = conn.cursor()
+    #prior to following, followee msut exist - will need to check
+
+    query  = "INSERT INTO `follow`(`followerUsername`, `followeeUsername`, `acceptedfollow`) VALUES (%s,%s,%s)"
+    #print(request.form['toFollow'])
+    cursor.execute(query, (username, toFollow, acceptedfol))
+    conn.commit()
+    return redirect(url_for('follow'))
+
+@app.route('/follow')
+def follow():
+    return render_template('follow.html')
 
 @app.route('/logout')
 def logout():
