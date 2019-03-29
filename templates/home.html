@@ -2,10 +2,12 @@
 <head>
 </head>
 <body>
-<form action="/post" method="POST">
+<form action="/post" method="POST" enctype="multipart/form-data" >
 	<h1>Welcome {{username}}</h1>
 	<input type="file" name="pic" accept="image/*" required> </br>
 	<input type="text" name="caption"> <br>
+	<input type="radio" name="allFollowers" value="true" required> Visible to All Followers<br>
+  <input type="radio" name="allFollowers" value="false"> Visible to Selected Groups<br>
 	<input type="submit" value = Post />
 </form>
 
@@ -25,7 +27,7 @@ Here are your posts:
 {% for line in posts %}
 	<tr>
 		<td>{{line.timestamp}}</td>
-		<td><img src="{{line.filePath}}"></td>
+		<td><img src="{{ url_for('static', filename = ('uploads/' + line.filePath) ) }}"></td>
 		<td>{{line.caption}}</td>
 	</tr>
 {% endfor %}

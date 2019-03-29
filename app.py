@@ -1,9 +1,11 @@
 #Import Flask Library
 from flask import Flask, render_template, request, session, url_for, redirect
 import pymysql.cursors
+import os
 
 #Initialize the app from Flask
 app = Flask(__name__)
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 #Configure MySQL
 conn = pymysql.connect(host='localhost',
@@ -101,10 +103,30 @@ def home():
 def post():
     username = session['username']
     cursor = conn.cursor();
-    blog = request.form['blog']
-    # query = 'INSERT INTO blog (blog_post, username) VALUES(%s, %s)'
-    cursor.execute(query, (blog, username))
+    pic = request.files['pic']
+    extension = os.path.splitext(pic.filename)[1]
+    caption = None if len(request.form['caption']) == 0 else request.form['caption']
+    allFollowers = True if request.form['allFollowers'] == "true" else False
+
+    target = os.path.join(APP_ROOT, 'uploads/')
+
+    query = 'INSERT INTO Photo (photoOwner, timestamp, caption, allFollowers) VALUES(%s, NOW(), %s, %s)'
+    cursor.execute(query, (username, caption, allFollowers))
     conn.commit()
+
+    query = 'SELECT photoID FROM Photo WHERE photoOwner = %s ORDER BY timestamp DESC'
+    cursor.execute(query, (username))
+    data = cursor.fetchone()
+    # print(data)
+    # print(extension)
+
+    file_name = str(data['photoID']) + extension
+    pic.save("/".join([APP_ROOT, "static/uploads", file_name]))
+
+    query = 'UPDATE Photo SET filePath = %s WHERE photoID = %s'
+    cursor.execute(query, (file_name, data['photoID']))
+    conn.commit()
+
     cursor.close()
     return redirect(url_for('home'))
 
