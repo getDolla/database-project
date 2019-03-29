@@ -158,19 +158,44 @@ def send_follow():
     #reloads page but sends follow to user specified
     username = session['username']
     toFollow = request.form['toFollow']
-    acceptedfol = False
     cursor = conn.cursor()
     #prior to following, followee msut exist - will need to check
 
     query  = "INSERT INTO `follow`(`followerUsername`, `followeeUsername`, `acceptedfollow`) VALUES (%s,%s,%s)"
     #print(request.form['toFollow'])
-    cursor.execute(query, (username, toFollow, acceptedfol))
+    cursor.execute(query, (username, toFollow, False))
     conn.commit()
+    return redirect(url_for('follow'))
+
+@app.route('/accept_follow/<follower>')
+def accept_follow(follower):
+    cursor = conn.cursor()
+    query = 'UPDATE Follow SET acceptedfollow = 1 WHERE followerUsername = %s AND followeeUsername = %s'
+    cursor.execute(query, (follower, session['username']))
+    conn.commit()
+
+    cursor.close()
+    return redirect(url_for('follow'))
+
+@app.route('/reject_follow/<follower>')
+def reject_follow(follower):
+    cursor = conn.cursor()
+    query = 'DELETE FROM Follow WHERE followerUsername = %s AND followeeUsername = %s'
+    cursor.execute(query, (follower, session['username']))
+    conn.commit()
+
+    cursor.close()
     return redirect(url_for('follow'))
 
 @app.route('/follow')
 def follow():
-    return render_template('follow.html')
+    user = session['username']
+    cursor = conn.cursor();
+    query = 'SELECT followerUsername FROM Follow WHERE followeeUsername = %s AND acceptedfollow = 0'
+    cursor.execute(query, (user))
+    data = cursor.fetchall()
+    cursor.close()
+    return render_template('follow.html', requests = data)
 
 @app.route('/logout')
 def logout():

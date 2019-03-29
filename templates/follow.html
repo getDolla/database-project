@@ -13,8 +13,13 @@ Who would you like to follow?
 
 <div> Pending Requests </div>
 <table>
-	<th>User</th>
-	<th>Accept?</th>
+	{% for follower in requests %}
+		<tr>
+			<td>{{follower.followerUsername}}</td>
+			<td><a href="/accept_follow/{{ follower.followerUsername }}">Accept</a></td>
+			<td><a href="/reject_follow/{{ follower.followerUsername }}">Reject</a></td>
+		</tr>
+	{% endfor %}
 </table>
 <br />
 
