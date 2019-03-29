@@ -131,6 +131,11 @@ def show_posts():
     cursor.close()
     return render_template('show_posts.html', poster_name=poster, posts=data)
 
+@app.route('/send_follow', methods = ["GET", "POST"])
+def send_follow():
+    #loads friends page with requests to user, allows user to send req to others
+    return render_template('send_follow_req.html')
+
 @app.route('/logout')
 def logout():
     session.pop('username')
