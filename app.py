@@ -3,6 +3,15 @@ from flask import Flask, render_template, request, session, url_for, redirect
 import pymysql.cursors
 import os
 
+import hashlib
+
+salt = b"dankmemes"
+
+def sha1Pass(password):
+    m = hashlib.sha1()
+    m.update(password)
+    return m.hexdigest()
+
 #Initialize the app from Flask
 app = Flask(__name__)
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -36,7 +45,7 @@ def register():
 def loginAuth():
     #grabs information from the forms
     username = request.form['username']
-    password = request.form['password']
+    password = sha1Pass((request.form['password']).encode('utf-8') + salt)
 
     #cursor used to send queries
     cursor = conn.cursor()
@@ -63,7 +72,7 @@ def loginAuth():
 def registerAuth():
     #grabs information from the forms
     username = request.form['username']
-    password = request.form['password']
+    password = sha1Pass((request.form['password']).encode('utf-8') + salt)
     fname = request.form['fname']
     lname = request.form['lname']
 
