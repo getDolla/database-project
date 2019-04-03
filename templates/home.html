@@ -23,12 +23,16 @@ Here are your posts:
 
 <table>
 	<th>Time</th>
+	<th>Creator</th>
+	<th>Post ID</th>
 	<th>Post</th>
 	<th>Caption</th>
 
 {% for line in posts %}
 	<tr>
 		<td>{{line.timestamp}}</td>
+		<td>{{line.photoOwner}}</td>
+		<td>{{line.photoID}}</td>
 		<td><img src="{{ url_for('static', filename = ('uploads/' + line.filePath) ) }}"></td>
 		<td>{{line.caption}}</td>
 	</tr>
