@@ -1,5 +1,5 @@
 #Import Flask Library
-from flask import Flask, render_template, request, session, url_for, redirect
+from flask import Flask, flash, render_template, request, session, url_for, redirect
 import pymysql.cursors
 import os
 
@@ -219,12 +219,22 @@ def create_group():
     user = session['username']
     group_name = request.form["createGroup"]
     cursor = conn.cursor();
-    query = 'INSERT INTO closefriendgroup (groupName, groupOwner) VALUES (%s,%s);'
-    cursor.execute(query, (group_name, user))
-    query = 'INSERT INTO belong (groupName, groupOwner, username) VALUES (%s,%s,%s);'
-    cursor.execute(query, (group_name, user, user))
+    #check if user already owns a
+    query = 'SELECT Count(*) as count FROM closefriendgroup WHERE groupName = %s AND groupOwner = %s;'
+    cursor.execute(query,(group_name, user))
     data = cursor.fetchall()
-    cursor.close()
+    print(data[0]['count'])
+    if data[0]['count'] == 1:
+        #print("I already own a group with this name")
+        flash('You already own a group with name:' + group_name)
+    else:
+        #create a group if user does not currently own a group
+        query = 'INSERT INTO closefriendgroup (groupName, groupOwner) VALUES (%s,%s);'
+        cursor.execute(query, (group_name, user))
+        query = 'INSERT INTO belong (groupName, groupOwner, username) VALUES (%s,%s,%s);'
+        cursor.execute(query, (group_name, user, user))
+        cursor.close()
+
     return redirect(url_for('group'))
 
 @app.route('/logout')

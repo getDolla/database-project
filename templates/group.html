@@ -3,6 +3,15 @@
 </head>
 <body>
 
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class=flashes>
+      {% for message in messages %}
+        <div>{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
 
 Create group:
 <form action = "/create_group" method = "POST">
