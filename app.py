@@ -256,15 +256,15 @@ def add_friend():
         if data[0]['count'] > 0:
             #to_add already in group
             flash(to_add + " is already in " + group_name)
-        else
+        else:
             query = 'SELECT Count(*) as count FROM Person WHERE username = %s;'
-            cursor.execute(query,(user))
+            cursor.execute(query,(to_add))
             data = cursor.fetchall()
             if data[0]['count'] == 1:
                 query = 'INSERT INTO belong (groupName, groupOwner, username) VALUES (%s,%s,%s);'
                 cursor.execute(query, (group_name, user, to_add))
             else:
-                flash(user + " does not exist!")
+                flash(to_add + " does not exist!")
     else:
         #to_add already in group
         flash("You need to be the owner of " + group_name)
