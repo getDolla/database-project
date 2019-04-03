@@ -182,7 +182,6 @@ def accept_follow(follower):
     query = 'UPDATE Follow SET acceptedfollow = 1 WHERE followerUsername = %s AND followeeUsername = %s'
     cursor.execute(query, (follower, session['username']))
     conn.commit()
-
     cursor.close()
     return redirect(url_for('follow'))
 
@@ -192,7 +191,6 @@ def reject_follow(follower):
     query = 'DELETE FROM Follow WHERE followerUsername = %s AND followeeUsername = %s'
     cursor.execute(query, (follower, session['username']))
     conn.commit()
-
     cursor.close()
     return redirect(url_for('follow'))
 
@@ -205,6 +203,29 @@ def follow():
     data = cursor.fetchall()
     cursor.close()
     return render_template('follow.html', requests = data)
+
+@app.route('/group')
+def group():
+    user = session['username']
+    cursor = conn.cursor()
+    query = 'SELECT groupName, groupOwner FROM Belong WHERE username = %s'
+    cursor.execute(query, (user))
+    data = cursor.fetchall()
+    cursor.close()
+    return render_template('group.html', request = data)
+
+@app.route('/create_group',  methods = ["GET", "POST"])
+def create_group():
+    user = session['username']
+    group_name = request.form["createGroup"]
+    cursor = conn.cursor();
+    query = 'INSERT INTO closefriendgroup (groupName, groupOwner) VALUES (%s,%s);'
+    cursor.execute(query, (group_name, user))
+    query = 'INSERT INTO belong (groupName, groupOwner, username) VALUES (%s,%s,%s);'
+    cursor.execute(query, (group_name, user, user))
+    data = cursor.fetchall()
+    cursor.close()
+    return redirect(url_for('group'))
 
 @app.route('/logout')
 def logout():

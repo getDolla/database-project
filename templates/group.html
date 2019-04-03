@@ -1,0 +1,33 @@
+<html>
+<head>
+</head>
+<body>
+
+
+Create group:
+<form action = "/create_group" method = "POST">
+  <input type="text" name = "createGroup" placeholder="Group Name" required/> </br>
+	<input type="submit" value = 'Create' />
+</form>
+
+Who would you like to add?
+<form action="/add_friend" method="POST">
+	<input type="text" name = "toAdd" placeholder="username" required/> </br>
+	<input type="submit" value = 'Send Request' />
+</form>
+<br />
+
+<div> Groups you belong in:</div>
+<table>
+  <td> Group name:</td>
+  <td> Group owner: </td>
+  {% for group in request %}
+		<tr>
+			<td>{{group.groupName}}</td>
+      <td>{{group.groupOwner}}</td>
+		</tr>
+	{% endfor %}
+</table>
+
+</body>
+</html>
