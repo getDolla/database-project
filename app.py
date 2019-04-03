@@ -239,8 +239,31 @@ def create_group():
 
 @app.route('/add_friend', methods = ["GET", "POST"])
 def add_friend():
+    user = session['username']
+    group_name = request.form["group_name"]
+    to_add = request.form["toAdd"]
+    cursor = conn.cursor();
+
+    #find if group exists and you are the owner
+    query = 'SELECT Count(*) as count FROM closefriendgroup WHERE groupName = %s AND groupOwner = %s;'
+    cursor.execute(query,(group_name, user))
+    data = cursor.fetchall()
+    if data[0]['count'] == 1:
+        #check if user you are adding is already in the group
+        query = 'SELECT Count(*) as count FROM belong WHERE groupName = %s AND groupOwner = %s AND username = %s;'
+        cursor.execute(query, (group_name, user, to_add))
+        data = cursor.fetchall()
+        if data[0]['count'] = 0:
+            #to_add already in group
+            flash(to_add + "is already in your group, " = group_name)
+        else
+            query = 'INSERT INTO belong (groupName, groupOwner, username) VALUES (%s,%s,%s);'
+            cursor.execute(query, (group_name, user, to_add))
+    else:
+        pass
+
     return redirect(url_for('group'))
-    
+
 @app.route('/logout')
 def logout():
     session.pop('username')
