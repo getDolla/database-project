@@ -19,8 +19,9 @@ Create group:
 	<input type="submit" value = 'Create' />
 </form>
 
-Who would you like to add?
+Who would you like to add to which group?
 <form action="/add_friend" method="POST">
+  <input type="text" name = "group_name" placeholder="group name" required/> <br>
 	<input type="text" name = "toAdd" placeholder="username" required/> </br>
 	<input type="submit" value = 'Send Request' />
 </form>

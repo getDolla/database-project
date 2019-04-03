@@ -237,6 +237,10 @@ def create_group():
 
     return redirect(url_for('group'))
 
+@app.route('/add_friend', methods = ["GET", "POST"])
+def add_friend():
+    return redirect(url_for('group'))
+    
 @app.route('/logout')
 def logout():
     session.pop('username')
