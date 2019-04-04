@@ -188,11 +188,22 @@ def send_follow():
     toFollow = request.form['toFollow']
     cursor = conn.cursor()
     #prior to following, followee msut exist - will need to check
-
-    query  = "INSERT INTO `follow`(`followerUsername`, `followeeUsername`, `acceptedfollow`) VALUES (%s,%s,%s)"
-    #print(request.form['toFollow'])
-    cursor.execute(query, (username, toFollow, False))
-    conn.commit()
+    query = 'SELECT Count(*) as count FROM Person WHERE username = %s;'
+    cursor.execute(query, (toFollow))
+    data = cursor.fetchall()
+    if data[0]['count'] == 1:
+        query = 'SELECT Count(*) as count FROM Follow WHERE followerUsername = %s AND followeeUsername = %s;'
+        cursor.execute(query, (username, toFollow))
+        data = cursor.fetchall()
+        if data[0]['count'] == 1:
+            flash("You're already following " + toFollow)
+        else:
+            query  = "INSERT INTO `follow`(`followerUsername`, `followeeUsername`, `acceptedfollow`) VALUES (%s,%s,%s)"
+            #print(request.form['toFollow'])
+            cursor.execute(query, (username, toFollow, False))
+            conn.commit()
+    else:
+        flash(toFollow + " does not exist!")
     return redirect(url_for('follow'))
 
 @app.route('/accept_follow/<follower>')

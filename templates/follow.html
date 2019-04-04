@@ -11,6 +11,16 @@ Who would you like to follow?
 </form>
 <br />
 
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class=flashes>
+      {% for message in messages %}
+        <div>{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
 <div> Pending Requests </div>
 <table>
 	{% for follower in requests %}
