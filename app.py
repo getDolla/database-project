@@ -216,10 +216,16 @@ def reject_follow(follower):
 @app.route('/follow')
 def follow():
     user = session['username']
+    data = []
     cursor = conn.cursor();
+    #get users who are still pending
     query = 'SELECT followerUsername FROM Follow WHERE followeeUsername = %s AND acceptedfollow = 0'
     cursor.execute(query, (user))
-    data = cursor.fetchall()
+    data.append(cursor.fetchall())
+    #get users who were accepted
+    query = 'SELECT followerUsername FROM Follow WHERE followeeUsername = %s AND acceptedfollow = 1'
+    cursor.execute(query, (user))
+    data.append(cursor.fetchall())
     cursor.close()
     return render_template('follow.html', requests = data)
 
