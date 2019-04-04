@@ -27,8 +27,17 @@
 				{% endfor %}
 			}
 		};
+		var validate = function() {
+			var groupChecked = false;
+			{% for num in length %}
+			if(document.getElementById("{{ 'groupName,' + num|string }}").checked) {
+				groupChecked = true;
+			}
+			{% endfor %}
+			return groupChecked;
+		};
 	</script>
-	<input type="submit" value = Post />
+	<input type="submit" id = "submit" value = Post onclick="return validate()"/>
 </form>
 
 <style type="text/css">
