@@ -2,12 +2,32 @@
 <head>
 </head>
 <body>
-<form action="/post" method="POST" enctype="multipart/form-data" >
+<form action="/post" method="POST" enctype="multipart/form-data" id = "post_form">
 	<h1>Welcome {{username}}</h1>
 	<input type="file" name="pic" accept="image/*" required> </br>
 	<input type="text" name="caption"> <br>
-	<input type="radio" name="allFollowers" value="true" required> Visible to All Followers<br>
-  <input type="radio" name="allFollowers" value="false"> Visible to Selected Groups<br>
+	<input type="radio" name="allFollowers" value="true" onclick="check()" required> Visible to All Followers<br>
+  <input type="radio" name="allFollowers" value="false" id="group" onclick="check()"> Visible to Selected Groups<br>
+	<div style="left: 10%;" id = "groups">
+		{% for num in length %}
+		<input type="checkbox" id = "{{ 'groupName,' + num|string }}" name="{{ 'groupName,' + num|string }}" value="{{group[num].groupName}}" disabled> {{group[num].groupName}}
+		<input type="hidden" name="{{ 'groupOwner,' + num|string }}" value="{{group[num].groupOwner}}"><br>
+		{% endfor %}
+	</div>
+	<script>
+		var check = function() {
+			if(document.getElementById("group").checked) {
+				{% for num in length %}
+				document.getElementById("{{ 'groupName,' + num|string }}").disabled = false;
+				{% endfor %}
+			}
+			else {
+				{% for num in length %}
+				document.getElementById("{{ 'groupName,' + num|string }}").disabled = true;
+				{% endfor %}
+			}
+		};
+	</script>
 	<input type="submit" value = Post />
 </form>
 

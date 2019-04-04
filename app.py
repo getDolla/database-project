@@ -104,8 +104,12 @@ def home():
     query = 'SELECT photoID, photoOwner, timestamp, filePath, caption FROM Photo WHERE photoOwner = %s ORDER BY timestamp DESC'
     cursor.execute(query, (user))
     data = cursor.fetchall()
+    query = 'SELECT * FROM Belong WHERE username = %s'
+    cursor.execute(query, (user))
+    groups = cursor.fetchall()
+    length = [ i for i in range(len(groups)) ]
     cursor.close()
-    return render_template('home.html', username=user, posts=data)
+    return render_template('home.html', username=user, posts=data, group = groups, length = length)
 
 
 @app.route('/post', methods=['GET', 'POST'])
@@ -135,6 +139,21 @@ def post():
     query = 'UPDATE Photo SET filePath = %s WHERE photoID = %s'
     cursor.execute(query, (file_name, data['photoID']))
     conn.commit()
+
+    if not allFollowers:
+        groupName = dict()
+        groupOwner = dict()
+        for key in request.form:
+            split = key.split(",")
+            if "groupName" == split[0]:
+                groupName[int(split[1])] = request.form[key]
+            elif "groupOwner" == split[0]:
+                groupOwner[int(split[1])] = request.form[key]
+
+        for key in groupName:
+            query = "INSERT INTO Share VALUES(%s, %s, %s)"
+            cursor.execute(query, (groupName[key], groupOwner[key], data['photoID']))
+            conn.commit()
 
     cursor.close()
     return redirect(url_for('home'))
