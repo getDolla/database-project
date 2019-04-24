@@ -114,6 +114,7 @@ def home():
 
 @app.route('/post', methods=['GET', 'POST'])
 def post():
+    print("test")
     username = session['username']
     cursor = conn.cursor();
     pic = request.files['pic']

@@ -6,7 +6,7 @@
 	<h1>Welcome {{username}}</h1>
 	<input type="file" name="pic" accept="image/*" required> </br>
 	<input type="text" name="caption"> <br>
-	<input type="radio" name="allFollowers" value="true" onclick="check()" required> Visible to All Followers<br>
+	<input type="radio" name="allFollowers" value="true" onclick="check()" required id = "follower"> Visible to All Followers<br>
   <input type="radio" name="allFollowers" value="false" id="group" onclick="check()"> Visible to Selected Groups<br>
 	<div style="left: 10%;" id = "groups">
 		{% for num in length %}
@@ -28,7 +28,7 @@
 			}
 		};
 		var validate = function() {
-			var groupChecked = false;
+			var groupChecked = document.getElementById("follower").checked;
 			{% for num in length %}
 			if(document.getElementById("{{ 'groupName,' + num|string }}").checked) {
 				groupChecked = true;
