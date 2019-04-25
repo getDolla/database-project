@@ -58,7 +58,7 @@ Here are your posts:
 	<th>Caption</th>
 	<th>Tag Friends</th>
 	<th>Comment</th>
-	<th>Likes</th>
+	<th>Like</th>
 
 {% for line in posts %}
 	<tr>
@@ -83,14 +83,24 @@ Here are your posts:
 			</form>
 		</td>
 		<td>
+
+
 			{% for like in likes %}
 			{% if like.photoID == line.photoID %}
-				like.count
+			{{like.count}}
 			{% else %}
 				0
 			{% endif %}
 			<br>
 			{% endfor %}
+
+
+
+
+			<form action="/like/{{line.photoID}}" method="POST" id = "liker">
+				<input type="submit" id = "submit" value = Like>
+			</form>
+		</td>
 	</tr>
 {% endfor %}
 </table>

@@ -105,6 +105,10 @@ def home():
     cursor.execute(query, (user))
     data = cursor.fetchall()
 
+    query = "SELECT photoID, Count(*) AS count FROM Liked GROUP BY photoID"
+    cursor.execute(query)
+    likes = cursor.fetchall()
+
     query = 'SELECT username, photoID, commentText, timestamp FROM Comment ORDER BY timestamp ASC'
     cursor.execute(query)
     commentsData = cursor.fetchall()
@@ -113,10 +117,6 @@ def home():
     cursor.execute(query, (user))
     groups = cursor.fetchall()
     length = [ i for i in range(len(groups)) ]
-
-    query = "SELECT photoID, Count(*) as count FROM LIkes GROUP BY photoID;"
-    cursor.execute(query)
-    likes = cursor.fetchall()
     cursor.close()
     return render_template('home.html', username=user, posts=data, group = groups, length = length, comments = commentsData, likes = likes)
 
@@ -178,9 +178,15 @@ def comment(photoID):
     cursor.close()
     return redirect(url_for('home'))
 
-
-
-
+@app.route("/like/<photoID>", methods=['GET', 'POST'])
+def like(photoID):
+    username = session['username']
+    cursor = conn.cursor()
+    query = 'INSERT INTO Liked (username, photoID, timestamp) VALUES(%s, %s, NOW())'
+    cursor.execute(query, (username, photoID))
+    conn.commit()
+    cursor.close()
+    return redirect(url_for('home'))
 
 @app.route('/select_blogger')
 def select_blogger():
