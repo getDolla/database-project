@@ -63,7 +63,7 @@ Here are your posts:
 		<td>{{line.timestamp}}</td>
 		<td>{{line.photoOwner}}</td>
 		<td>{{line.photoID}}</td>
-		<td><img src="{{ url_for('static', filename = ('uploads/' + line.filePath) ) }}"></td>
+		<td><img src="{{ url_for('static', filename = ('uploads/' + line.filePath) ) }}" alt="Image" height="42" width="42"></td>
 		<td>{{line.caption}}</td>
 		<td><a href = "/tag/{{ line.photoID }}">Tag</a> <br /></td>
 	</tr>
