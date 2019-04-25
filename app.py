@@ -312,7 +312,14 @@ def add_friend():
 
 @app.route("/tag/<photoID>")
 def tag(photoID):
-    return render_template('add_tag.html')
+    cursor = conn.cursor();
+    query = 'SELECT filePath FROM Photo WHERE photoID = %s;'
+    cursor.execute(query, (photoID))
+    filePath = cursor.fetchall()[0]["filePath"]
+    query = 'SELECT * FROM Tag WHERE username = %s;'
+    cursor.execute(query, (session["username"]))
+    data = cursor.fetchall()
+    return render_template("add_tag.html", photoID = photoID, filePath = filePath, requests = data)
 
 
 @app.route("/add_tag")

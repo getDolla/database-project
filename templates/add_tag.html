@@ -5,7 +5,7 @@
 
 
 Who would you like to tag in this photo (ID: {{ photoID }})? <br>
-<img src="{{ url_for('static', filename = ('uploads/' + line.filePath) ) }}">
+<img src="{{ url_for('static', filename = ('uploads/' + filePath) ) }}">
 <form action="/add_tag" method="POST">
 	<input type="text" name = "toTag" placeholder="username" required/> <br>
 	<input type="submit" value = 'Send Request' />
