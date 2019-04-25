@@ -1,0 +1,39 @@
+<html>
+<head>
+</head>
+<body>
+
+
+Who would you like to tag in this photo (ID: {{ photoID }})? <br>
+<img src="{{ url_for('static', filename = ('uploads/' + line.filePath) ) }}">
+<form action="/add_tag" method="POST">
+	<input type="text" name = "toTag" placeholder="username" required/> <br>
+	<input type="submit" value = 'Send Request' />
+	<input type="hidden" name = "photoID" value="{{ photoID }}">
+</form>
+<br />
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class=flashes>
+      {% for message in messages %}
+        <div>{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div> Pending Requests </div>
+<table>
+	{% for tagee in requests[0] %}
+		<tr>
+			<td>{{ tagee.username }} on photo {{ photoID }}</td>
+			<td><a href="/accept_tag/{{ tagee.username }}/{{ photoID }}">Accept</a></td>
+			<td><a href="/reject_tag/{{ tagee.username }}/{{ photoID }}">Reject</a></td>
+		</tr>
+	{% endfor %}
+</table>
+<br />
+
+
+</html>

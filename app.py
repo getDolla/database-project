@@ -270,6 +270,7 @@ def create_group():
         cursor.execute(query, (group_name, user))
         query = 'INSERT INTO belong (groupName, groupOwner, username) VALUES (%s,%s,%s);'
         cursor.execute(query, (group_name, user, user))
+        conn.commit()
         cursor.close()
 
     return redirect(url_for('group'))
@@ -300,6 +301,7 @@ def add_friend():
             if data[0]['count'] == 1:
                 query = 'INSERT INTO belong (groupName, groupOwner, username) VALUES (%s,%s,%s);'
                 cursor.execute(query, (group_name, user, to_add))
+                conn.commit()
             else:
                 flash(to_add + " does not exist!")
     else:
@@ -307,6 +309,29 @@ def add_friend():
         flash("You need to be the owner of " + group_name)
 
     return redirect(url_for('group'))
+
+@app.route("/add_tag")
+def add_tag():
+    username = session["username"]
+    tagee = request.form["toTag"]
+    photoID = request.form["photoID"]
+    cursor = conn.cursor();
+
+    #check if user you are adding is already being tagged
+    query = 'SELECT Count(*) as count FROM Tag WHERE username = %s;'
+    cursor.execute(query, (tagee))
+    data = cursor.fetchall()
+    if data[0]['count'] == 1:
+        added = True if username == tagee else False
+        query = 'INSERT INTO Tag(username, photoID, acceptedTag) VALUES (%s, %s, %s);'
+        cursor.execute(query, (tagee, photoID, added))
+        conn.commit()
+    else:
+        #to_add already in group
+        flash(tagee + " is already being tagged")
+
+    return redirect(url_for('group'))
+
 
 @app.route('/logout')
 def logout():
