@@ -335,13 +335,13 @@ def tag(photoID):
     query = 'SELECT filePath FROM Photo WHERE photoID = %s;'
     cursor.execute(query, (photoID))
     filePath = cursor.fetchall()[0]["filePath"]
-    query = 'SELECT * FROM Tag WHERE username = %s;'
+    query = 'SELECT * FROM Tag WHERE username = %s AND acceptedTag <> 1;'
     cursor.execute(query, (session["username"]))
     data = cursor.fetchall()
     return render_template("add_tag.html", photoID = photoID, filePath = filePath, requests = data)
 
 
-@app.route("/add_tag")
+@app.route("/add_tag", methods = ["GET", "POST"])
 def add_tag():
     username = session["username"]
     tagee = request.form["toTag"]
@@ -349,10 +349,11 @@ def add_tag():
     cursor = conn.cursor();
 
     #check if user you are adding is already being tagged
-    query = 'SELECT Count(*) as count FROM Tag WHERE username = %s;'
-    cursor.execute(query, (tagee))
+    query = 'SELECT Count(*) as count FROM Tag WHERE username = %s AND photoID = %s;'
+    cursor.execute(query, (tagee, photoID))
     data = cursor.fetchall()
-    if data[0]['count'] == 1:
+    print(data)
+    if data[0]['count'] == 0:
         added = True if username == tagee else False
         query = 'INSERT INTO Tag(username, photoID, acceptedTag) VALUES (%s, %s, %s);'
         cursor.execute(query, (tagee, photoID, added))
@@ -361,7 +362,25 @@ def add_tag():
         #to_add already in group
         flash(tagee + " is already being tagged")
 
-    return redirect(url_for('group'))
+    return redirect(url_for('tag', photoID = photoID))
+
+@app.route('/accept_tag/<tagee>/<photoID>')
+def accept_tag(tagee, photoID):
+    cursor = conn.cursor()
+    query = 'UPDATE Tag SET acceptedTag = 1 WHERE username = %s AND photoID = %s;'
+    cursor.execute(query, (tagee, photoID))
+    conn.commit()
+    cursor.close()
+    return redirect(url_for('tag', photoID = photoID))
+
+@app.route('/reject_tag/<tagee>/<photoID>')
+def reject_tag(tagee, photoID):
+    cursor = conn.cursor()
+    query = 'DELETE FROM Tag WHERE username = %s AND photoID = %s;'
+    cursor.execute(query, (tagee, photoID))
+    conn.commit()
+    cursor.close()
+    return redirect(url_for('tag', photoID = photoID))
 
 
 @app.route('/logout')
