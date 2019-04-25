@@ -104,19 +104,23 @@ def home():
     query = 'SELECT photoID, photoOwner, timestamp, filePath, caption FROM Photo WHERE photoOwner = %s ORDER BY timestamp DESC'
     cursor.execute(query, (user))
     data = cursor.fetchall()
+
+    query = 'SELECT username, photoID, commentText, timestamp FROM Comment ORDER BY timestamp ASC'
+    cursor.execute(query)
+    commentsData = cursor.fetchall()
+
     query = 'SELECT * FROM Belong WHERE username = %s'
     cursor.execute(query, (user))
     groups = cursor.fetchall()
     length = [ i for i in range(len(groups)) ]
     cursor.close()
-    return render_template('home.html', username=user, posts=data, group = groups, length = length)
+    return render_template('home.html', username=user, posts=data, group = groups, length = length, comments = commentsData)
 
 
 @app.route('/post', methods=['GET', 'POST'])
 def post():
-    print("test")
     username = session['username']
-    cursor = conn.cursor();
+    cursor = conn.cursor()
     pic = request.files['pic']
     extension = os.path.splitext(pic.filename)[1]
     caption = None if len(request.form['caption']) == 0 else request.form['caption']
@@ -158,6 +162,21 @@ def post():
 
     cursor.close()
     return redirect(url_for('home'))
+
+@app.route("/comment/<photoID>", methods=['GET', 'POST'])
+def comment(photoID):
+    username = session['username']
+    cursor = conn.cursor()
+    comment = None if len(request.form['myComment']) == 0 else request.form['myComment']
+    query = 'INSERT INTO Comment (username, photoID, commentText, timestamp) VALUES(%s, %s, %s, NOW())'
+    cursor.execute(query, (username, photoID, comment))
+    conn.commit()
+    cursor.close()
+    return redirect(url_for('home'))
+
+
+
+
 
 @app.route('/select_blogger')
 def select_blogger():
