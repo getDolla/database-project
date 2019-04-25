@@ -56,6 +56,7 @@ Here are your posts:
 	<th>Post ID</th>
 	<th>Post</th>
 	<th>Caption</th>
+	<th>Tag Friends</th>
 
 {% for line in posts %}
 	<tr>
@@ -64,6 +65,7 @@ Here are your posts:
 		<td>{{line.photoID}}</td>
 		<td><img src="{{ url_for('static', filename = ('uploads/' + line.filePath) ) }}"></td>
 		<td>{{line.caption}}</td>
+		<td><a href = "/tag/{{ line.photoID }}">Tag</a> <br /></td>
 	</tr>
 {% endfor %}
 </table>

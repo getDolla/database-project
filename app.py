@@ -310,6 +310,11 @@ def add_friend():
 
     return redirect(url_for('group'))
 
+@app.route("/tag/<photoID>")
+def tag(photoID):
+    return render_template('add_tag.html')
+
+
 @app.route("/add_tag")
 def add_tag():
     username = session["username"]
