@@ -113,8 +113,12 @@ def home():
     cursor.execute(query, (user))
     groups = cursor.fetchall()
     length = [ i for i in range(len(groups)) ]
+
+    query = "SELECT photoID, Count(*) as count FROM LIkes GROUP BY photoID;"
+    cursor.execute(query)
+    likes = cursor.fetchall()
     cursor.close()
-    return render_template('home.html', username=user, posts=data, group = groups, length = length, comments = commentsData)
+    return render_template('home.html', username=user, posts=data, group = groups, length = length, comments = commentsData, likes = likes)
 
 
 @app.route('/post', methods=['GET', 'POST'])

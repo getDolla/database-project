@@ -58,6 +58,7 @@ Here are your posts:
 	<th>Caption</th>
 	<th>Tag Friends</th>
 	<th>Comment</th>
+	<th>Likes</th>
 
 {% for line in posts %}
 	<tr>
@@ -81,6 +82,15 @@ Here are your posts:
 				<input type="submit" id = "submit" value = Comment>
 			</form>
 		</td>
+		<td>
+			{% for like in likes %}
+			{% if like.photoID == line.photoID %}
+				like.count
+			{% else %}
+				0
+			{% endif %}
+			<br>
+			{% endfor %}
 	</tr>
 {% endfor %}
 </table>
