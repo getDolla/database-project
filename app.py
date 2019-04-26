@@ -118,7 +118,7 @@ def home():
     groups = cursor.fetchall()
     length = [ i for i in range(len(groups)) ]
 
-    query = "SELECT * FROM Tag WHERE photoID IN (SELECT photoID FROM Photo WHERE photoOwner = %s);"
+    query = "SELECT * FROM Tag WHERE photoID IN (SELECT photoID FROM Photo WHERE photoOwner = %s) AND acceptedTag = 1;"
     cursor.execute(query, (user))
     tags = cursor.fetchall()
 
@@ -259,6 +259,30 @@ def reject_follow(follower):
     cursor.close()
     return redirect(url_for('follow'))
 
+@app.route('/follower_unfollow/<followee>')
+def follower_unfollow(followee):
+    cursor = conn.cursor()
+    query = 'DELETE FROM Follow WHERE followeeUsername = %s AND followerUsername = %s'
+    cursor.execute(query, (followee, session['username']))
+    conn.commit()
+    query = 'DELETE FROM Tag WHERE username = %s AND photoID IN (SELECT photoID FROM Photo WHERE photoOwner = %s) '
+    cursor.execute(query, (session['username'], followee))
+    conn.commit()
+    cursor.close()
+    return redirect(url_for('follow'))
+
+@app.route('/followee_unfollow/<follower>')
+def followee_unfollow(follower):
+    cursor = conn.cursor()
+    query = 'DELETE FROM Follow WHERE followerUsername = %s AND followeeUsername = %s'
+    cursor.execute(query, (follower, session['username']))
+    conn.commit()
+    query = 'DELETE FROM Tag WHERE username = %s AND photoID IN (SELECT photoID FROM Photo WHERE photoOwner = %s) '
+    cursor.execute(query, (follower, session['username']))
+    conn.commit()
+    cursor.close()
+    return redirect(url_for('follow'))
+
 @app.route('/follow')
 def follow():
     user = session['username']
@@ -268,7 +292,11 @@ def follow():
     query = 'SELECT followerUsername FROM Follow WHERE followeeUsername = %s AND acceptedfollow = 0'
     cursor.execute(query, (user))
     data.append(cursor.fetchall())
-    #get users who were accepted
+    # get following
+    query = 'SELECT followeeUsername FROM Follow WHERE followerUsername = %s AND acceptedfollow = 1'
+    cursor.execute(query, (user))
+    data.append(cursor.fetchall())
+    #get users who were accepted (followers)
     query = 'SELECT followerUsername FROM Follow WHERE followeeUsername = %s AND acceptedfollow = 1'
     cursor.execute(query, (user))
     data.append(cursor.fetchall())
