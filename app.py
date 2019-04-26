@@ -105,20 +105,25 @@ def home():
     cursor.execute(query, (user))
     data = cursor.fetchall()
 
-    query = "SELECT photoID, Count(*) AS count FROM Liked GROUP BY photoID"
-    cursor.execute(query)
+    query = "SELECT photoID, Count(*) AS count FROM Liked WHERE photoID IN (SELECT photoID FROM Photo WHERE photoOwner = %s) GROUP BY photoID"
+    cursor.execute(query, (user))
     likes = cursor.fetchall()
 
-    query = 'SELECT username, photoID, commentText, timestamp FROM Comment ORDER BY timestamp ASC'
-    cursor.execute(query)
+    query = 'SELECT username, photoID, commentText, timestamp FROM Comment WHERE photoID IN (SELECT photoID FROM Photo WHERE photoOwner = %s) ORDER BY timestamp ASC'
+    cursor.execute(query, (user))
     commentsData = cursor.fetchall()
 
     query = 'SELECT * FROM Belong WHERE username = %s'
     cursor.execute(query, (user))
     groups = cursor.fetchall()
     length = [ i for i in range(len(groups)) ]
+
+    query = "SELECT * FROM Tag WHERE photoID IN (SELECT photoID FROM Photo WHERE photoOwner = %s);"
+    cursor.execute(query, (user))
+    tags = cursor.fetchall()
+
     cursor.close()
-    return render_template('home.html', username=user, posts=data, group = groups, length = length, comments = commentsData, likes = likes)
+    return render_template('home.html', username=user, posts=data, group = groups, length = length, comments = commentsData, likes = likes, tags = tags)
 
 
 @app.route('/post', methods=['GET', 'POST'])

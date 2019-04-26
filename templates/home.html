@@ -56,7 +56,7 @@ Here are your posts:
 	<th>Post ID</th>
 	<th>Post</th>
 	<th>Caption</th>
-	<th>Tag Friends</th>
+	<th>Tagged</th>
 	<th>Comment</th>
 	<th>Like</th>
 
@@ -67,7 +67,18 @@ Here are your posts:
 		<td>{{line.photoID}}</td>
 		<td><img src="{{ url_for('static', filename = ('uploads/' + line.filePath) ) }}" alt="Image" height="42" width="42"></td>
 		<td>{{line.caption}}</td>
-		<td><a href = "/tag/{{ line.photoID }}">Tag</a> <br /></td>
+		<td>
+			{% for tag in tags %}
+			{% if tag.photoID == line.photoID %}
+
+			{{tag.username}}
+			<br />
+
+			{% endif %}
+			{% endfor %}
+			<br>
+			<a href = "/tag/{{ line.photoID }}">Tag</a>
+		</td>
 		<td>
 			<form action="/comment/{{line.photoID}}" method="POST" id = "commenter">
 				{% for comment in comments %}
