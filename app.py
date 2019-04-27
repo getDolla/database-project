@@ -368,6 +368,14 @@ def kick_member(group,username):
     data = cursor.fetchall()
     return render_template('manage_groups.html', data = data)
 
+@app.route('/leave_group/<group>/<group_owner>')
+def leave_group(group,group_owner):
+    print(group, group_owner)
+    cursor = conn.cursor()
+    query = "DELETE FROM belong WHERE `groupName` = %s AND `groupOwner` = %s AND `username` = %s;"
+    cursor.execute(query, (group, group_owner, session["username"]))
+    return redirect(url_for('group'))
+
 @app.route('/add_friend', methods = ["GET", "POST"])
 def add_friend():
     user = session['username']

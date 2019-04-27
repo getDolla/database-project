@@ -30,7 +30,7 @@ Members:
 </table>
 
 {% if data[0].groupOwner != session['username'] %}
-  <button> Leave Group </button>
+  <a href = "/leave_group/{{data[0].groupName}}/{{data[0].groupOwner}}"> Leave Group </a>
 {% endif %}
 
 {% if data[0].groupOwner == session['username'] %}
