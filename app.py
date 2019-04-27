@@ -100,22 +100,38 @@ def registerAuth():
 @app.route('/home')
 def home():
     user = session['username']
-    cursor = conn.cursor();
-    query = 'SELECT photoID, photoOwner, timestamp, filePath, caption FROM Photo WHERE photoOwner = %s ORDER BY timestamp DESC'
-    cursor.execute(query, (user))
+    cursor = conn.cursor()
+    query = 'SELECT photoID, photoOwner, timestamp, filePath, caption FROM Photo ORDER BY timestamp DESC'
+    cursor.execute(query)
     data = cursor.fetchall()
+
+    query = "SELECT photoID, Count(*) AS count FROM Liked GROUP BY photoID"
+    cursor.execute(query)
+    likes = cursor.fetchall()
+
+    query = 'SELECT username, photoID, commentText, timestamp FROM Comment ORDER BY timestamp ASC'
+    cursor.execute(query)
+    commentsData = cursor.fetchall()
+
     query = 'SELECT * FROM Belong WHERE username = %s'
     cursor.execute(query, (user))
     groups = cursor.fetchall()
     length = [ i for i in range(len(groups)) ]
+
+
+    #prob needs to be fixed
+    query = "SELECT * FROM Tag WHERE photoID IN (SELECT photoID FROM Photo WHERE photoOwner = %s) AND acceptedTag = 1;"
+    cursor.execute(query, (user))
+    tags = cursor.fetchall()
+
     cursor.close()
-    return render_template('home.html', username=user, posts=data, group = groups, length = length)
+    return render_template('home.html', username=user, posts=data, group = groups, length = length, comments = commentsData, likes = likes, tags = tags)
 
 
 @app.route('/post', methods=['GET', 'POST'])
 def post():
     username = session['username']
-    cursor = conn.cursor();
+    cursor = conn.cursor()
     pic = request.files['pic']
     extension = os.path.splitext(pic.filename)[1]
     caption = None if len(request.form['caption']) == 0 else request.form['caption']
@@ -155,6 +171,27 @@ def post():
             cursor.execute(query, (groupName[key], groupOwner[key], data['photoID']))
             conn.commit()
 
+    cursor.close()
+    return redirect(url_for('home'))
+
+@app.route("/comment/<photoID>", methods=['GET', 'POST'])
+def comment(photoID):
+    username = session['username']
+    cursor = conn.cursor()
+    comment = None if len(request.form['myComment']) == 0 else request.form['myComment']
+    query = 'INSERT INTO Comment (username, photoID, commentText, timestamp) VALUES(%s, %s, %s, NOW())'
+    cursor.execute(query, (username, photoID, comment))
+    conn.commit()
+    cursor.close()
+    return redirect(url_for('home'))
+
+@app.route("/like/<photoID>", methods=['GET', 'POST'])
+def like(photoID):
+    username = session['username']
+    cursor = conn.cursor()
+    query = 'INSERT INTO Liked (username, photoID, timestamp) VALUES(%s, %s, NOW())'
+    cursor.execute(query, (username, photoID))
+    conn.commit()
     cursor.close()
     return redirect(url_for('home'))
 
@@ -234,11 +271,42 @@ def follow():
     cursor.execute(query, (user))
     data.append(cursor.fetchall())
     #get users who were accepted
+
+    # get following (double check)
+    query = 'SELECT followeeUsername FROM Follow WHERE followerUsername = %s AND acceptedfollow = 1'
+    cursor.execute(query, (user))
+    data.append(cursor.fetchall())
+
+
     query = 'SELECT followerUsername FROM Follow WHERE followeeUsername = %s AND acceptedfollow = 1'
     cursor.execute(query, (user))
     data.append(cursor.fetchall())
     cursor.close()
     return render_template('follow.html', requests = data)
+
+@app.route('/follower_unfollow/<followee>')
+def follower_unfollow(followee):
+    cursor = conn.cursor()
+    query = 'DELETE FROM Follow WHERE followeeUsername = %s AND followerUsername = %s'
+    cursor.execute(query, (followee, session['username']))
+    conn.commit()
+    query = 'DELETE FROM Tag WHERE username = %s AND photoID IN (SELECT photoID FROM Photo WHERE photoOwner = %s) '
+    cursor.execute(query, (session['username'], followee))
+    conn.commit()
+    cursor.close()
+    return redirect(url_for('follow'))
+
+@app.route('/followee_unfollow/<follower>')
+def followee_unfollow(follower):
+    cursor = conn.cursor()
+    query = 'DELETE FROM Follow WHERE followerUsername = %s AND followeeUsername = %s'
+    cursor.execute(query, (follower, session['username']))
+    conn.commit()
+    query = 'DELETE FROM Tag WHERE username = %s AND photoID IN (SELECT photoID FROM Photo WHERE photoOwner = %s) '
+    cursor.execute(query, (follower, session['username']))
+    conn.commit()
+    cursor.close()
+    return redirect(url_for('follow'))
 
 @app.route('/group')
 def group():
@@ -254,7 +322,7 @@ def group():
 def create_group():
     user = session['username']
     group_name = request.form["createGroup"]
-    cursor = conn.cursor()
+    cursor = conn.cursor();
     #check if user already owns a
     query = 'SELECT Count(*) as count FROM closefriendgroup WHERE groupName = %s AND groupOwner = %s;'
     cursor.execute(query,(group_name, user))
@@ -269,6 +337,9 @@ def create_group():
         cursor.execute(query, (group_name, user))
         query = 'INSERT INTO belong (groupName, groupOwner, username) VALUES (%s,%s,%s);'
         cursor.execute(query, (group_name, user, user))
+
+        #double check was removed
+        conn.commit()
         cursor.close()
 
     return redirect(url_for('group'))
@@ -310,6 +381,7 @@ def add_friend():
             if data[0]['count'] == 1:
                 query = 'INSERT INTO belong (groupName, groupOwner, username) VALUES (%s,%s,%s);'
                 cursor.execute(query, (group_name, user, to_add))
+                conn.commit()
             else:
                 flash(to_add + " does not exist!")
     else:
@@ -317,6 +389,60 @@ def add_friend():
         flash("You need to be the owner of " + group_name)
 
     return redirect(url_for('group'))
+
+@app.route("/tag/<photoID>")
+def tag(photoID):
+    cursor = conn.cursor();
+    query = 'SELECT filePath FROM Photo WHERE photoID = %s;'
+    cursor.execute(query, (photoID))
+    filePath = cursor.fetchall()[0]["filePath"]
+    query = 'SELECT * FROM Tag WHERE username = %s AND acceptedTag <> 1;'
+    cursor.execute(query, (session["username"]))
+    data = cursor.fetchall()
+    return render_template("add_tag.html", photoID = photoID, filePath = filePath, requests = data)
+
+
+@app.route("/add_tag", methods = ["GET", "POST"])
+def add_tag():
+    username = session["username"]
+    tagee = request.form["toTag"]
+    photoID = request.form["photoID"]
+    cursor = conn.cursor();
+
+    #check if user you are adding is already being tagged
+    query = 'SELECT Count(*) as count FROM Tag WHERE username = %s AND photoID = %s;'
+    cursor.execute(query, (tagee, photoID))
+    data = cursor.fetchall()
+    print(data)
+    if data[0]['count'] == 0:
+        added = True if username == tagee else False
+        query = 'INSERT INTO Tag(username, photoID, acceptedTag) VALUES (%s, %s, %s);'
+        cursor.execute(query, (tagee, photoID, added))
+        conn.commit()
+    else:
+        #to_add already in group
+        flash(tagee + " is already being tagged")
+
+    return redirect(url_for('tag', photoID = photoID))
+
+@app.route('/accept_tag/<tagee>/<photoID>')
+def accept_tag(tagee, photoID):
+    cursor = conn.cursor()
+    query = 'UPDATE Tag SET acceptedTag = 1 WHERE username = %s AND photoID = %s;'
+    cursor.execute(query, (tagee, photoID))
+    conn.commit()
+    cursor.close()
+    return redirect(url_for('tag', photoID = photoID))
+
+@app.route('/reject_tag/<tagee>/<photoID>')
+def reject_tag(tagee, photoID):
+    cursor = conn.cursor()
+    query = 'DELETE FROM Tag WHERE username = %s AND photoID = %s;'
+    cursor.execute(query, (tagee, photoID))
+    conn.commit()
+    cursor.close()
+    return redirect(url_for('tag', photoID = photoID))
+
 
 @app.route('/logout')
 def logout():
