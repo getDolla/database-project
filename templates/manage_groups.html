@@ -1,0 +1,43 @@
+<html>
+<head>
+</head>
+<body>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class=flashes>
+      {% for message in messages %}
+        <div>{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+Group name: {{data[0].groupName}}
+<br />
+Members:
+<table>
+  {% for group in data %}
+  <tr>
+      <td> {{group.username}} </td>
+      <td>
+        {% if group.groupOwner != group.username and session['username'] == group.groupOwner%}
+          <button> Kick </button>
+        {% endif %}
+      </td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% if data[0].groupOwner != session['username'] %}
+  <button> Leave Group </button>
+{% endif %}
+
+{% if data[0].groupOwner == session['username'] %}
+  <button> Delete Group </button>
+{% endif %}
+
+</br>
+You are logged in as : {{session['username']}}
+</body>
+</html>

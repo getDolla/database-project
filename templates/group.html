@@ -35,6 +35,7 @@ Who would you like to add to which group?
 		<tr>
 			<td>{{group.groupName}}</td>
       <td>{{group.groupOwner}}</td>
+      <td> <a href = "/manage_group/{{ group.groupName }}/{{group.groupOwner}}"> Manage </a>
 		</tr>
 	{% endfor %}
 </table>
