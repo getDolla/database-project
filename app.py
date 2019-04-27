@@ -376,6 +376,21 @@ def leave_group(group,group_owner):
     cursor.execute(query, (group, group_owner, session["username"]))
     return redirect(url_for('group'))
 
+@app.route('/close_group/<group>/<group_owner>')
+def close_group(group,group_owner):
+    print(group,group_owner)
+    cursor = conn.cursor()
+
+    #remove everyone from the group
+    query = "DELETE FROM belong WHERE `groupName` = %s AND `groupOwner` = %s;"
+    cursor.execute(query, (group,group_owner))
+
+    #kill the group
+    query = "DELETE FROM closefriendgroup WHERE `groupName` = %s AND `groupOwner` = %s;"
+    cursor.execute(query, (group,group_owner))
+
+    return redirect(url_for('group'))
+
 @app.route('/add_friend', methods = ["GET", "POST"])
 def add_friend():
     user = session['username']

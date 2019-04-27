@@ -34,7 +34,7 @@ Members:
 {% endif %}
 
 {% if data[0].groupOwner == session['username'] %}
-  <button> Delete Group </button>
+  <a href = "/close_group/{{data[0].groupName}}/{{data[0].groupOwner}}"> Close Group </a>
 {% endif %}
 
 </br>
