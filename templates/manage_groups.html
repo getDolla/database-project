@@ -22,7 +22,7 @@ Members:
       <td> {{group.username}} </td>
       <td>
         {% if group.groupOwner != group.username and session['username'] == group.groupOwner%}
-          <button> Kick </button>
+          <a href = "/kick_member/{{group.groupName}}/{{group.username}}"> Kick </a>
         {% endif %}
       </td>
   </tr>

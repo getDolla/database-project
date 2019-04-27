@@ -352,7 +352,20 @@ def manage_group(group,group_owner):
     query = "SELECT groupName, groupOwner, username FROM belong WHERE groupName = %s and groupOwner = %s"
     cursor.execute(query, (group,group_owner))
     data = cursor.fetchall()
-    print(data)
+    return render_template('manage_groups.html', data = data)
+
+@app.route('/kick_member/<group>/<username>', methods = ["GET","POST"])
+def kick_member(group,username):
+    groupName = group
+    toKick = username
+    cursor = conn.cursor()
+    query = "DELETE FROM belong WHERE `groupName` = %s AND `groupOwner` = %s AND `username` = %s;"
+    print(query, (group,session["username"],toKick))
+    cursor.execute(query, (group,session["username"],toKick))
+
+    query = "SELECT groupName, groupOwner, username FROM belong WHERE groupName = %s and groupOwner = %s"
+    cursor.execute(query, (group,session["username"]))
+    data = cursor.fetchall()
     return render_template('manage_groups.html', data = data)
 
 @app.route('/add_friend', methods = ["GET", "POST"])
