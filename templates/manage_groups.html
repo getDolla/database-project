@@ -22,7 +22,7 @@ Members:
       <td> {{group.username}} </td>
       <td>
         {% if group.groupOwner != group.username and session['username'] == group.groupOwner%}
-          <button> Kick </button>
+          <a href = "/kick_member/{{group.groupName}}/{{group.username}}"> Kick </a>
         {% endif %}
       </td>
   </tr>
@@ -30,11 +30,11 @@ Members:
 </table>
 
 {% if data[0].groupOwner != session['username'] %}
-  <button> Leave Group </button>
+  <a href = "/leave_group/{{data[0].groupName}}/{{data[0].groupOwner}}"> Leave Group </a>
 {% endif %}
 
 {% if data[0].groupOwner == session['username'] %}
-  <button> Delete Group </button>
+  <a href = "/close_group/{{data[0].groupName}}/{{data[0].groupOwner}}"> Close Group </a>
 {% endif %}
 
 </br>
