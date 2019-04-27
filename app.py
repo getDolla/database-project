@@ -5,6 +5,7 @@ import os
 
 import hashlib
 
+
 salt = b"dankmemes"
 
 def sha1Pass(password):
@@ -101,7 +102,7 @@ def registerAuth():
 def home():
     user = session['username']
     cursor = conn.cursor()
-    query = 'SELECT photoID, photoOwner, timestamp, filePath, caption FROM Photo ORDER BY timestamp DESC'
+    query = 'SELECT photoID, photoOwner, timestamp, filePath, caption, allFollowers FROM Photo ORDER BY timestamp DESC'
     cursor.execute(query)
     data = cursor.fetchall()
 
@@ -112,12 +113,15 @@ def home():
     query = 'SELECT username, photoID, commentText, timestamp FROM Comment ORDER BY timestamp ASC'
     cursor.execute(query)
     commentsData = cursor.fetchall()
-
+    #all groups user can post too
     query = 'SELECT * FROM Belong WHERE username = %s'
     cursor.execute(query, (user))
     groups = cursor.fetchall()
     length = [ i for i in range(len(groups)) ]
-
+    #all groups user can see pcitures from
+    query = 'SELECT * FROM Belong NATURAL JOIN Share WHERE username = %s'
+    cursor.execute(query, (user))
+    viewableGroups = cursor.fetchall()
 
     #prob needs to be fixed
     query = "SELECT * FROM Tag WHERE photoID IN (SELECT photoID FROM Photo WHERE photoOwner = %s) AND acceptedTag = 1;"
@@ -125,7 +129,7 @@ def home():
     tags = cursor.fetchall()
 
     cursor.close()
-    return render_template('home.html', username=user, posts=data, group = groups, length = length, comments = commentsData, likes = likes, tags = tags)
+    return render_template('home.html', username=user, posts=data, group = groups, length = length, comments = commentsData, likes = likes, tags = tags, viewableGroups = viewableGroups)
 
 
 @app.route('/post', methods=['GET', 'POST'])

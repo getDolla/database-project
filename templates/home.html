@@ -60,12 +60,25 @@ Here are your posts:
 	<th>Comment</th>
 	<th>Like</th>
 
+{% set glob={} %}
 {% for line in posts %}
+{% set x = glob.update({'visible':false}) %}
+{% set groupVisible = [] %}
+{% for group in viewableGroups %}
+	{% if group.photoID == line.photoID %}
+		{% set x = glob.update({'visible':True}) %}
+	{% endif %}
+{% endfor %}
+{% if glob['visible'] or line.allFollowers == 1 %}
 	<tr>
 		<td>{{line.timestamp}}</td>
 		<td>{{line.photoOwner}}</td>
 		<td>{{line.photoID}}</td>
-		<td><img src="{{ url_for('static', filename = ('uploads/' + line.filePath) ) }}" alt="Image" height="42" width="42"></td>
+
+		<td>
+					<img src="{{ url_for('static', filename = ('uploads/' + line.filePath) ) }}" alt="Image" height="42" width="42">
+		</td>
+
 		<td>{{line.caption}}</td>
 		<td>
 			{% for tag in tags %}
@@ -99,10 +112,7 @@ Here are your posts:
 			{% for like in likes %}
 			{% if like.photoID == line.photoID %}
 			{{like.count}}
-			{% else %}
-				0
 			{% endif %}
-			<br>
 			{% endfor %}
 
 
@@ -113,7 +123,12 @@ Here are your posts:
 			</form>
 		</td>
 	</tr>
+	{% endif %}
+
+
 {% endfor %}
+
+
 </table>
 
 <a href="/select_blogger">Select a blogger</a>
