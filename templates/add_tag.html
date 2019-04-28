@@ -6,14 +6,16 @@
 <button onclick="location.href='/home'" type="button"> Back </button>
 <br />
 
-<font size="+2"><u>Who would you like to tag in this photo (ID: {{ photoID }})?</u> </font><br>
-<img src="{{ url_for('static', filename = ('uploads/' + filePath) ) }}" alt="Image" height="80" width="80">
+<font size="+1"><u>Who would you like to tag in this photo (ID: {{ photoID }})?</u> </font><br><br>
+<img src="{{ url_for('static', filename = ('uploads/' + filePath) ) }}" alt="Image" style="max-height: 1000px; max-width: 1000px;">
+<br><br>
 <form action="/add_tag" method="POST">
 	<input type="text" name = "toTag" placeholder="username" required/> <br>
 	<input type="submit" value = 'Send Request' />
 	<input type="hidden" name = "photoID" value="{{ photoID }}">
 </form>
-<br />
+<br>
+<br>
 
 {% with messages = get_flashed_messages() %}
   {% if messages %}
@@ -25,7 +27,7 @@
   {% endif %}
 {% endwith %}
 
-<div> <font size="+2"><u>My Pending Requests:</u></font></div>
+<div> <font size="+1"><u>My Pending Requests:</u></font></div>
 <table>
 	{% for tagee in requests %}
 		<tr>
