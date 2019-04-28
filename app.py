@@ -102,7 +102,7 @@ def registerAuth():
 def home():
     user = session['username']
     cursor = conn.cursor()
-    query = 'SELECT * FROM (SELECT * FROM Photo AS p WHERE p.photoID IN (SELECT photoID FROM Belong NATURAL JOIN Share WHERE username = %s) OR (allfollowers = 1 AND EXISTS (SELECT * FROM Follow WHERE followerUsername = %s and followeeUsername = p.photoOwner)) OR (p.photoOwner = %s)) AS temp1 LEFT JOIN (SELECT l.photoID, l.likeCount, r.ifLiked FROM (SELECT photoID, count(*) AS likeCount FROM Liked GROUP BY photoID) AS l LEFT JOIN (SELECT photoID, True AS ifLiked FROM Liked WHERE username = %s) AS r ON (l.photoID = r.photoID)) AS temp2 ON (temp1.photoID = temp2.photoID) ORDER BY timestamp DESC'
+    query = 'SELECT * FROM (SELECT * FROM Photo AS p WHERE p.photoID IN (SELECT photoID FROM Belong NATURAL JOIN Share WHERE username = %s AND accepted = 1) OR (allfollowers = 1 AND EXISTS (SELECT * FROM Follow WHERE followerUsername = %s and followeeUsername = p.photoOwner)) OR (p.photoOwner = %s)) AS temp1 LEFT JOIN (SELECT l.photoID, l.likeCount, r.ifLiked FROM (SELECT photoID, count(*) AS likeCount FROM Liked GROUP BY photoID) AS l LEFT JOIN (SELECT photoID, True AS ifLiked FROM Liked WHERE username = %s) AS r ON (l.photoID = r.photoID)) AS temp2 ON (temp1.photoID = temp2.photoID) ORDER BY timestamp DESC'
     cursor.execute(query, (user, user, user, user))
     data = cursor.fetchall()
 
@@ -505,7 +505,7 @@ def add_tag():
                 cursor.execute(query, (tagee, photoID, True))
                 conn.commit()
             else:
-                query = 'SELECT photoID FROM Photo AS p WHERE p.photoID IN (SELECT photoID FROM Belong NATURAL JOIN Share WHERE username = %s) OR (allfollowers = 1 AND EXISTS (SELECT * FROM Follow WHERE followerUsername = %s and followeeUsername = p.photoOwner)) OR (p.photoOwner = %s)'
+                query = 'SELECT photoID FROM Photo AS p WHERE p.photoID IN (SELECT photoID FROM Belong NATURAL JOIN Share WHERE username = %s AND accepted = 1) OR (allfollowers = 1 AND EXISTS (SELECT * FROM Follow WHERE followerUsername = %s and followeeUsername = p.photoOwner)) OR (p.photoOwner = %s)'
                 cursor.execute(query, (tagee, tagee, tagee))
                 data = cursor.fetchall()
                 # print(data)
@@ -559,7 +559,7 @@ def get_tag():
         flash("Tag: " + tag + " does not exist!")
         return redirect(url_for('search_tag'))
 
-    query = 'SELECT * FROM (SELECT temp1.photoID, photoOwner, timestamp, filePath, caption, allFollowers, likeCount, ifLiked FROM ((SELECT * FROM Photo AS p WHERE p.photoID IN (SELECT photoID FROM Belong b NATURAL JOIN Share WHERE username = %s) OR (allfollowers = 1 AND EXISTS (SELECT * FROM Follow WHERE followerUsername = %s and followeeUsername = p.photoOwner)) OR (p.photoOwner = %s)) AS temp1 LEFT JOIN (SELECT l.photoID, l.likeCount, r.ifLiked FROM (SELECT photoID, count(*) AS likeCount FROM Liked GROUP BY photoID) AS l LEFT JOIN (SELECT photoID, True AS ifLiked FROM Liked WHERE username = %s) AS r ON (l.photoID = r.photoID)) AS temp2 ON (temp1.photoID = temp2.photoID))) as temp NATURAL JOIN Tag as t WHERE t.username = %s ORDER BY timestamp DESC;'
+    query = 'SELECT * FROM (SELECT temp1.photoID, photoOwner, timestamp, filePath, caption, allFollowers, likeCount, ifLiked FROM ((SELECT * FROM Photo AS p WHERE p.photoID IN (SELECT photoID FROM Belong b NATURAL JOIN Share WHERE username = %s AND accepted = 1) OR (allfollowers = 1 AND EXISTS (SELECT * FROM Follow WHERE followerUsername = %s and followeeUsername = p.photoOwner)) OR (p.photoOwner = %s)) AS temp1 LEFT JOIN (SELECT l.photoID, l.likeCount, r.ifLiked FROM (SELECT photoID, count(*) AS likeCount FROM Liked GROUP BY photoID) AS l LEFT JOIN (SELECT photoID, True AS ifLiked FROM Liked WHERE username = %s) AS r ON (l.photoID = r.photoID)) AS temp2 ON (temp1.photoID = temp2.photoID))) as temp NATURAL JOIN Tag as t WHERE t.username = %s ORDER BY timestamp DESC;'
     cursor.execute(query, (user, user, user, user, tag))
     data = cursor.fetchall()
 
