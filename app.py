@@ -102,8 +102,8 @@ def registerAuth():
 def home():
     user = session['username']
     cursor = conn.cursor()
-    query = 'SELECT photoID, photoOwner, timestamp, filePath, caption, allFollowers FROM Photo ORDER BY timestamp DESC'
-    cursor.execute(query)
+    query = 'SELECT * FROM Photo AS p WHERE p.photoID IN (SELECT photoID FROM Belong NATURAL JOIN Share WHERE username = %s) OR (allfollowers = 1 AND EXISTS (SELECT * FROM Follow WHERE followerUsername = %s and followeeUsername = p.photoOwner)) OR (p.photoOwner = %s) ORDER BY timestamp DESC'
+    cursor.execute(query, (user, user, user))
     data = cursor.fetchall()
 
     query = "SELECT photoID, Count(*) AS count FROM Liked GROUP BY photoID"
@@ -118,18 +118,19 @@ def home():
     cursor.execute(query, (user))
     groups = cursor.fetchall()
     length = [ i for i in range(len(groups)) ]
-    #all groups user can see pcitures from
-    query = 'SELECT * FROM Belong NATURAL JOIN Share WHERE username = %s'
-    cursor.execute(query, (user))
-    viewableGroups = cursor.fetchall()
 
     #prob needs to be fixed
     query = "SELECT * FROM Tag WHERE acceptedTag = 1;"
     cursor.execute(query)
     tags = cursor.fetchall()
 
+    #need natural join for photoid but can join in the last query to avoid errors
+    query = 'SELECT * FROM Belong NATURAL JOIN SHARE WHERE username = %s'
+    cursor.execute(query, (user))
+    viewableGroups = cursor.fetchall()
+
     cursor.close()
-    return render_template('home.html', username=user, posts=data, group = groups, length = length, comments = commentsData, likes = likes, tags = tags, viewableGroups = viewableGroups)
+    return render_template('home.html', username=user, posts=data, group = groups, length = length, comments = commentsData, likes = likes, tags = tags,viewableGroups=viewableGroups)
 
 
 @app.route('/post', methods=['GET', 'POST'])

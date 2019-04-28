@@ -54,27 +54,33 @@ Here are your posts:
 	<th>Time</th>
 	<th>Creator</th>
 	<th>Post ID</th>
+	<th>Groups</th>
 	<th>Post</th>
 	<th>Caption</th>
 	<th>Tagged</th>
 	<th>Comment</th>
 	<th>Like</th>
 
-{% set glob={} %}
+
 {% for line in posts %}
-{% set x = glob.update({'visible':false}) %}
-{% set groupVisible = [] %}
-{% for group in viewableGroups %}
-	{% if group.photoID == line.photoID %}
-		{% set x = glob.update({'visible':True}) %}
-	{% endif %}
-{% endfor %}
-{% if glob['visible'] or line.allFollowers == 1 %}
+
 	<tr>
 		<td>{{line.timestamp}}</td>
 		<td>{{line.photoOwner}}</td>
 		<td>{{line.photoID}}</td>
+		<td>
+			{% if line.allFollowers == 1 %}
+			"All Followers"
+			<br />
+			{% endif %}
+			{% for group in viewableGroups %}
+				{% if group.photoID == line.photoID %}
+					"{{group.groupName}}"
+					<br />
+				{% endif %}
+			{% endfor %}
 
+		</td>
 		<td>
 					<img src="{{ url_for('static', filename = ('uploads/' + line.filePath) ) }}" alt="Image" height="42" width="42">
 		</td>
@@ -123,7 +129,6 @@ Here are your posts:
 			</form>
 		</td>
 	</tr>
-	{% endif %}
 
 
 {% endfor %}
