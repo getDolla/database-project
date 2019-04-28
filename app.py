@@ -102,13 +102,9 @@ def registerAuth():
 def home():
     user = session['username']
     cursor = conn.cursor()
-    query = 'SELECT * FROM Photo AS p WHERE p.photoID IN (SELECT photoID FROM Belong NATURAL JOIN Share WHERE username = %s) OR (allfollowers = 1 AND EXISTS (SELECT * FROM Follow WHERE followerUsername = %s and followeeUsername = p.photoOwner)) OR (p.photoOwner = %s) ORDER BY timestamp DESC'
-    cursor.execute(query, (user, user, user))
+    query = 'SELECT * FROM (SELECT * FROM Photo AS p WHERE p.photoID IN (SELECT photoID FROM Belong NATURAL JOIN Share WHERE username = %s) OR (allfollowers = 1 AND EXISTS (SELECT * FROM Follow WHERE followerUsername = %s and followeeUsername = p.photoOwner)) OR (p.photoOwner = %s)) AS temp1 LEFT JOIN (SELECT l.photoID, l.likeCount, r.ifLiked FROM (SELECT photoID, count(*) AS likeCount FROM Liked GROUP BY photoID) AS l LEFT JOIN (SELECT photoID, True AS ifLiked FROM Liked WHERE username = %s) AS r ON (l.photoID = r.photoID)) AS temp2 ON (temp1.photoID = temp2.photoID) ORDER BY timestamp DESC'
+    cursor.execute(query, (user, user, user, user))
     data = cursor.fetchall()
-
-    query = "SELECT photoID, Count(*) AS count FROM Liked GROUP BY photoID"
-    cursor.execute(query)
-    likes = cursor.fetchall()
 
     query = 'SELECT username, photoID, commentText, timestamp FROM Comment ORDER BY timestamp ASC'
     cursor.execute(query)
@@ -130,7 +126,7 @@ def home():
     viewableGroups = cursor.fetchall()
 
     cursor.close()
-    return render_template('home.html', username=user, posts=data, group = groups, length = length, comments = commentsData, likes = likes, tags = tags,viewableGroups=viewableGroups)
+    return render_template('home.html', username=user, posts=data, group = groups, length = length, comments = commentsData, tags = tags,viewableGroups=viewableGroups)
 
 
 @app.route('/post', methods=['GET', 'POST'])
@@ -195,6 +191,16 @@ def like(photoID):
     username = session['username']
     cursor = conn.cursor()
     query = 'INSERT INTO Liked (username, photoID, timestamp) VALUES(%s, %s, NOW())'
+    cursor.execute(query, (username, photoID))
+    conn.commit()
+    cursor.close()
+    return redirect(url_for('home'))
+
+@app.route("/unlike/<photoID>", methods=['GET', 'POST'])
+def unlike(photoID):
+    username = session['username']
+    cursor = conn.cursor()
+    query = 'DELETE FROM Liked WHERE username = %s AND photoID = %s'
     cursor.execute(query, (username, photoID))
     conn.commit()
     cursor.close()

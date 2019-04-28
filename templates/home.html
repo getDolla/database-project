@@ -113,20 +113,18 @@ Here are your posts:
 			</form>
 		</td>
 		<td>
+			{{line.likeCount}}
 
 
-			{% for like in likes %}
-			{% if like.photoID == line.photoID %}
-			{{like.count}}
-			{% endif %}
-			{% endfor %}
-
-
-
-
+			{% if line.ifLiked == 1 %}
+			<form action="/unlike/{{line.photoID}}" method="POST" id = "unliker">
+				<input type="submit" style="color:red" id = "submit" value = Unlike>
+			</form>
+			{% else %}
 			<form action="/like/{{line.photoID}}" method="POST" id = "liker">
 				<input type="submit" id = "submit" value = Like>
 			</form>
+			{% endif %}
 		</td>
 	</tr>
 
