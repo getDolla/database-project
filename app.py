@@ -445,7 +445,7 @@ def add_friend():
         data = cursor.fetchall()
         if data[0]['count'] > 0 :
             #to_add already in group
-            flash(to_add + " is already in " + group_name + "or the user has not accepted your request.")
+            flash(to_add + " is already in " + group_name + " or the user has not accepted your request.")
         else:
             query = 'SELECT Count(*) as count FROM Person WHERE username = %s;'
             cursor.execute(query,(to_add))
