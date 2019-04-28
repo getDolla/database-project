@@ -4,6 +4,7 @@
 <body>
 
 <button onclick="location.href='/home'" type="button"> Back </button>
+<br>
 
 Who would you like to follow?
 <form action="/send_follow" method="POST">
@@ -21,8 +22,6 @@ Who would you like to follow?
     </div>
   {% endif %}
 {% endwith %}
-
-<button onclick="location.href='/home'" type="button"> Back </button>
 
 <div> Pending Requests </div>
 <table>
