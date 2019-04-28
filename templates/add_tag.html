@@ -4,6 +4,7 @@
 <body>
 
 <button onclick="location.href='/home'" type="button"> Back </button>
+<br />
 
 <font size="+2"><u>Who would you like to tag in this photo (ID: {{ photoID }})?</u> </font><br>
 <img src="{{ url_for('static', filename = ('uploads/' + filePath) ) }}" alt="Image" height="80" width="80">
