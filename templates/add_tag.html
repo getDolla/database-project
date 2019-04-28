@@ -4,8 +4,8 @@
 <body>
 
 
-Who would you like to tag in this photo (ID: {{ photoID }})? <br>
-<img src="{{ url_for('static', filename = ('uploads/' + filePath) ) }}">
+<font size="+2"><u>Who would you like to tag in this photo (ID: {{ photoID }})?</u> </font><br>
+<img src="{{ url_for('static', filename = ('uploads/' + filePath) ) }}" alt="Image" height="80" width="80">
 <form action="/add_tag" method="POST">
 	<input type="text" name = "toTag" placeholder="username" required/> <br>
 	<input type="submit" value = 'Send Request' />
@@ -23,7 +23,7 @@ Who would you like to tag in this photo (ID: {{ photoID }})? <br>
   {% endif %}
 {% endwith %}
 
-<div> Pending Requests </div>
+<div> <font size="+2"><u>My Pending Requests:</u></font></div>
 <table>
 	{% for tagee in requests %}
 		<tr>
