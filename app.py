@@ -114,7 +114,7 @@ def home():
     cursor.execute(query)
     commentsData = cursor.fetchall()
     #all groups user can post too
-    query = 'SELECT * FROM Belong WHERE username = %s'
+    query = 'SELECT * FROM Belong WHERE username = %s AND accepted = 1'
     cursor.execute(query, (user))
     groups = cursor.fetchall()
     length = [ i for i in range(len(groups)) ]
