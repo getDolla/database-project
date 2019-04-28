@@ -224,6 +224,11 @@ def send_follow():
     #reloads page but sends follow to user specified
     username = session['username']
     toFollow = request.form['toFollow']
+
+    if toFollow == username:
+        flash("You cannot follow yourself :/")
+        return redirect(url_for('follow'))
+
     cursor = conn.cursor()
     #prior to following, followee must exist - will need to check
     query = 'SELECT Count(*) as count FROM Person WHERE username = %s;'
