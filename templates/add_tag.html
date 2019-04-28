@@ -31,8 +31,8 @@
 	{% for tagee in requests %}
 		<tr>
 			<td>{{ tagee.username }} on photo {{ tagee.photoID }} by {{ tagee.photoOwner }}</td>
-			<td><a href="/accept_tag/{{ tagee.username }}/{{ photoID }}">Accept</a></td>
-			<td><a href="/reject_tag/{{ tagee.username }}/{{ photoID }}">Reject</a></td>
+			<td><a href="/accept_tag/{{ tagee.username }}/{{ tagee.photoID }}">Accept</a></td>
+			<td><a href="/reject_tag/{{ tagee.username }}/{{ tagee.photoID }}">Reject</a></td>
 		</tr>
 	{% endfor %}
 </table>

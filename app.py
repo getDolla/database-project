@@ -505,10 +505,10 @@ def add_tag():
                 cursor.execute(query, (tagee, photoID, True))
                 conn.commit()
             else:
-                query = 'SELECT photoID FROM Photo AS p WHERE p.photoID IN (SELECT photoID FROM Belong NATURAL JOIN Share WHERE username = %s AND accepted = 1) OR (allfollowers = 1 AND EXISTS (SELECT * FROM Follow WHERE followerUsername = %s and followeeUsername = p.photoOwner)) OR (p.photoOwner = %s)'
-                cursor.execute(query, (tagee, tagee, tagee))
+                query = 'SELECT photoID FROM Photo AS p WHERE (p.photoID IN (SELECT photoID FROM Belong NATURAL JOIN Share WHERE username = %s AND accepted = 1) OR (allfollowers = 1 AND EXISTS (SELECT * FROM Follow WHERE followerUsername = %s and followeeUsername = p.photoOwner)) OR (p.photoOwner = %s)) AND (p.photoID = %s)'
+                cursor.execute(query, (tagee, tagee, tagee, photoID))
                 data = cursor.fetchall()
-                # print(data)
+                print(data)
                 # print(data[0]["photoID"])
                 # print(photoID)
                 if len(data) > 0 and int(photoID) == data[0]["photoID"]:
