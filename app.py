@@ -213,16 +213,6 @@ def select_blogger():
     cursor.close()
     return render_template('select_blogger.html', user_list=data)
 
-@app.route('/show_posts', methods=["GET", "POST"])
-def show_posts():
-    poster = request.args['poster']
-    cursor = conn.cursor();
-    # query = 'SELECT ts, blog_post FROM blog WHERE username = %s ORDER BY ts DESC'
-    cursor.execute(query, poster)
-    data = cursor.fetchall()
-    cursor.close()
-    return render_template('show_posts.html', poster_name=poster, posts=data)
-
 @app.route('/send_follow', methods = ["GET", "POST"])
 def send_follow():
     #reloads page but sends follow to user specified
@@ -516,6 +506,47 @@ def reject_tag(tagee, photoID):
     cursor.close()
     return redirect(url_for('tag', photoID = photoID))
 
+@app.route('/search_tag')
+def search_tag(user = session["username"], data = [], comments = [], likes = [], tages = [], viewableGroups = []):
+    return render_template('search_tag.html', username=user, posts=data, comments = commentsData, likes = likes, tags = tags, viewableGroups=viewableGroups)
+
+@app.route('/get_tag')
+def get_tag():
+    user = session['username']
+    tag = request.form["tag_name"]
+    cursor = conn.cursor()
+
+    
+
+    query = 'SELECT * FROM Photo NATURAL JOIN Tag WHERE username = %s AND photoID IN (SELECT photoID FROM Photo AS p WHERE p.photoID IN (SELECT photoID FROM Belong NATURAL JOIN Share WHERE username = %s) OR (allfollowers = 1 AND EXISTS (SELECT * FROM Follow WHERE followerUsername = %s and followeeUsername = p.photoOwner)) OR (p.photoOwner = %s) ORDER BY timestamp DESC)'
+    cursor.execute(query, (tag, user, user, user))
+    data = cursor.fetchall()
+
+    query = "SELECT photoID, Count(*) AS count FROM Liked GROUP BY photoID"
+    cursor.execute(query)
+    likes = cursor.fetchall()
+
+    query = 'SELECT username, photoID, commentText, timestamp FROM Comment ORDER BY timestamp ASC'
+    cursor.execute(query)
+    commentsData = cursor.fetchall()
+    #all groups user can post too
+    query = 'SELECT * FROM Belong WHERE username = %s AND accepted = 1'
+    cursor.execute(query, (user))
+    groups = cursor.fetchall()
+    length = [ i for i in range(len(groups)) ]
+
+    #prob needs to be fixed
+    query = "SELECT * FROM Tag WHERE acceptedTag = 1;"
+    cursor.execute(query)
+    tags = cursor.fetchall()
+
+    #need natural join for photoid but can join in the last query to avoid errors
+    query = 'SELECT * FROM Belong NATURAL JOIN SHARE WHERE username = %s'
+    cursor.execute(query, (user))
+    viewableGroups = cursor.fetchall()
+
+    cursor.close()
+    return redirect(url_for('search_tag', user = user, data = [], comments = [], likes = [], tages = [], viewableGroups = []))
 
 @app.route('/logout')
 def logout():
