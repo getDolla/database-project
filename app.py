@@ -246,6 +246,7 @@ def send_follow():
             conn.commit()
     else:
         flash(toFollow + " does not exist!")
+    cursor.close()
     return redirect(url_for('follow'))
 
 @app.route('/accept_follow/<follower>')
@@ -357,6 +358,7 @@ def manage_group(group,group_owner):
     query = "SELECT groupName, groupOwner, username FROM belong WHERE groupName = %s and groupOwner = %s"
     cursor.execute(query, (group,group_owner))
     data = cursor.fetchall()
+    cursor.close()
     return render_template('manage_groups.html', data = data)
 
 @app.route('/kick_member/<group>/<username>', methods = ["GET","POST"])
@@ -371,6 +373,7 @@ def kick_member(group,username):
     query = "SELECT groupName, groupOwner, username FROM belong WHERE groupName = %s and groupOwner = %s"
     cursor.execute(query, (group,session["username"]))
     data = cursor.fetchall()
+    cursor.close()
     return render_template('manage_groups.html', data = data)
 
 @app.route('/leave_group/<group>/<group_owner>')
@@ -379,6 +382,7 @@ def leave_group(group,group_owner):
     cursor = conn.cursor()
     query = "DELETE FROM belong WHERE `groupName` = %s AND `groupOwner` = %s AND `username` = %s;"
     cursor.execute(query, (group, group_owner, session["username"]))
+    cursor.close()
     return redirect(url_for('group'))
 
 @app.route('/close_group/<group>/<group_owner>')
@@ -393,7 +397,7 @@ def close_group(group,group_owner):
     #kill the group
     query = "DELETE FROM closefriendgroup WHERE `groupName` = %s AND `groupOwner` = %s;"
     cursor.execute(query, (group,group_owner))
-
+    cursor.close()
     return redirect(url_for('group'))
 
 @app.route('/add_friend', methods = ["GET", "POST"])
@@ -428,7 +432,7 @@ def add_friend():
     else:
         #to_add already in group
         flash("You need to be the owner of " + group_name)
-
+    cursor.close()
     return redirect(url_for('group'))
 
 @app.route("/tag/<photoID>")
@@ -441,6 +445,7 @@ def tag(photoID):
     cursor.execute(query, (session["username"]))
     data = cursor.fetchall()
     # print(data)
+    cursor.close()
     return render_template("add_tag.html", photoID = photoID, filePath = filePath, requests = data)
 
 
@@ -464,7 +469,7 @@ def add_tag():
     else:
         #to_add already in group
         flash(tagee + " is already being tagged")
-
+    cursor.close()
     return redirect(url_for('tag', photoID = photoID))
 
 @app.route('/accept_tag/<tagee>/<photoID>')
