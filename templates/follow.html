@@ -6,7 +6,7 @@
 <button onclick="location.href='/home'" type="button"> Back </button>
 <br />
 
-Who would you like to follow?
+<font size="+1"><u>Who would you like to follow:</font></u>
 <form action="/send_follow" method="POST">
 	<input type="text" name = "toFollow" placeholder="username" required/> <br>
 	<input type="submit" value = 'Send Request' />
@@ -23,7 +23,7 @@ Who would you like to follow?
   {% endif %}
 {% endwith %}
 
-<div> Pending Requests </div>
+<div> <font size="+1"><u>My Pending Requests:</font></u> </div>
 <table>
 	{% for follower in requests[0] %}
 		<tr>
@@ -35,7 +35,7 @@ Who would you like to follow?
 </table>
 <br />
 
-<div> Following</div>
+<div> <font size="+1"><u>Following:</font></u></div>
 <table>
 	{% for followee in requests[1] %}
 		<tr>
@@ -45,7 +45,7 @@ Who would you like to follow?
 	{% endfor %}
 </table>
 
-<div> Followers</div>
+<div> <font size="+1"><u>Followers:</font></u></div>
 <table>
 	{% for follower in requests[2] %}
 		<tr>

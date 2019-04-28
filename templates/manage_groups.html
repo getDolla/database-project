@@ -16,9 +16,9 @@
   {% endif %}
 {% endwith %}
 
-Group name: {{data[0].groupName}}
+<font size="+1"><u>Group Name:</font></u> {{data[0].groupName}}
 <br />
-Members:
+<font size="+1"><u>Members:</font></u>
 <table>
   {% for group in data %}
   <tr>
@@ -41,6 +41,6 @@ Members:
 {% endif %}
 
 </br>
-You are logged in as : {{session['username']}}
+<font size="+1"><u>You are logged in as:</font></u> {{session['username']}}
 </body>
 </html>

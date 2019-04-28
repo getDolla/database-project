@@ -6,7 +6,7 @@
 <button onclick="location.href='/home'" type="button"> Back </button>
 <br />
 
-<font size="+2"><u>Who would you like to tag in this photo (ID: {{ photoID }})?</u> </font><br>
+<font size="+1"><u>Who would you like to tag in this photo (ID: {{ photoID }})?</u> </font><br>
 <img src="{{ url_for('static', filename = ('uploads/' + filePath) ) }}" alt="Image" height="80" width="80">
 <form action="/add_tag" method="POST">
 	<input type="text" name = "toTag" placeholder="username" required/> <br>
@@ -25,7 +25,7 @@
   {% endif %}
 {% endwith %}
 
-<div> <font size="+2"><u>My Pending Requests:</u></font></div>
+<div> <font size="+1"><u>My Pending Requests:</u></font></div>
 <table>
 	{% for tagee in requests %}
 		<tr>

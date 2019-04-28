@@ -7,7 +7,7 @@
 	<input type="file" name="pic" accept="image/*" required> </br>
 	<input type="text" name="caption" placeholder="Caption"> <br>
 	<input type="radio" name="allFollowers" value="true" onclick="check()" required id = "follower"> Visible to All Followers<br>
-  <input type="radio" name="allFollowers" value="false" id="group" onclick="check()"> Visible to Selected Groups<br>
+  <input type="radio" name="allFollowers" value="false" id="group" onclick="check()"> Visible to Selected Groups:<br>
 	<div style="left: 10%;" id = "groups">
 		{% for num in length %}
 		<input type="checkbox" id = "{{ 'groupName,' + num|string }}" name="{{ 'groupName,' + num|string }}" value="{{group[num].groupName}}" disabled> {{group[num].groupName}}

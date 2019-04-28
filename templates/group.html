@@ -17,13 +17,13 @@
 
 <br /><br>
 
-Create group:
+<font size="+1"><u>Create group:</font></u>
 <form action = "/create_group" method = "POST">
   <input type="text" name = "createGroup" placeholder="Group Name" required/> </br>
 	<input type="submit" value = 'Create' />
 </form>
 
-Who would you like to add to which group?
+<font size="+1"><u>Who would you like to add to which group:</font></u>
 <form action="/add_friend" method="POST">
   <input type="text" name = "group_name" placeholder="group name" required/> <br>
 	<input type="text" name = "toAdd" placeholder="username" required/> </br>
@@ -31,10 +31,10 @@ Who would you like to add to which group?
 </form>
 <br />
 
-<div> Groups pending: </div>
+<div> <font size="+1"><u>Pending Group Requests:</font></u> </div>
 <table>
-  <td> Group name:</td>
-  <td> Group owner: </td>
+  <td> <div><u>Group name:</u></td>
+  <td> <div><u>Group owner:</u> </td>
   {% for group in pending %}
 		<tr>
 			<td>{{group.groupName}}</td>
@@ -47,10 +47,10 @@ Who would you like to add to which group?
 
 <hr />
 
-<div> Groups you belong in:</div>
+<div> <font size="+1"><u>Groups you belong in:</font></u></div>
 <table>
-  <td> Group name:</td>
-  <td> Group owner: </td>
+  <td><u>Group name:</u></td>
+  <td><u>Group owner:</u> </td>
   {% for group in request %}
 		<tr>
 			<td>{{group.groupName}}</td>
