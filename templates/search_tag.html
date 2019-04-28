@@ -48,73 +48,73 @@ Here are your posts:
 	<th>Likes</th>
 
 
-{% for line in posts %}
+	{% for line in posts %}
 
-	<tr>
-		<td>{{line.timestamp}}</td>
-		<td>{{line.photoOwner}}</td>
-		<td>{{line.photoID}}</td>
-		<td>
-			{% if line.allFollowers == 1 %}
-			All Followers
-			<br />
-			{% endif %}
-			{% for group in viewableGroups %}
-				{% if group.photoID == line.photoID %}
-					{{group.groupName}}
-					<br />
-				{% endif %}
-			{% endfor %}
-
-		</td>
-		<td>
-					<img src="{{ url_for('static', filename = ('uploads/' + line.filePath) ) }}" alt="Image" height="42" width="42">
-		</td>
-
-		<td>{{line.caption}}</td>
-		<td>
-			{% for tag in tags %}
-			{% if tag.photoID == line.photoID %}
-
-			{{tag.username}}
-			<br>
-
-			{% endif %}
-			{% endfor %}
-			<a href = "/tag/{{ line.photoID }}">Tag</a>
-		</td>
-		<td>
-			<form action="/comment/{{line.photoID}}" method="POST" id = "commenter">
-				{% for comment in comments %}
-				{% if comment.photoID == line.photoID %}
-
-				{{comment.username}}({{comment.timestamp}}): {{comment.commentText}}
+		<tr>
+			<td>{{line.timestamp}}</td>
+			<td>{{line.photoOwner}}</td>
+			<td>{{line.photoID}}</td>
+			<td>
+				{% if line.allFollowers == 1 %}
+				All Followers
 				<br />
+				{% endif %}
+				{% for group in viewableGroups %}
+					{% if group.photoID == line.photoID %}
+						{{group.groupName}}
+						<br />
+					{% endif %}
+				{% endfor %}
+
+			</td>
+			<td>
+						<img src="{{ url_for('static', filename = ('uploads/' + line.filePath) ) }}" alt="Image" height="80" width="80">
+			</td>
+
+			<td>{{line.caption}}</td>
+			<td>
+				{% for tag in tags %}
+				{% if tag.photoID == line.photoID %}
+
+				{{tag.username}}
+				<br>
 
 				{% endif %}
 				{% endfor %}
-				<input type="text" name="myComment"> <br>
-				<input type="submit" id = "submit" value = Comment>
-			</form>
-		</td>
-		<td>
-			{{line.likeCount}}
+				<a href = "/tag/{{ line.photoID }}">Tag</a>
+			</td>
+			<td>
+				<form action="/comment/{{line.photoID}}" method="POST" id = "commenter">
+					{% for comment in comments %}
+					{% if comment.photoID == line.photoID %}
+
+					{{comment.username}}({{comment.timestamp}}): {{comment.commentText}}
+					<br />
+
+					{% endif %}
+					{% endfor %}
+					<input type="text" name="myComment" required> <br>
+					<input type="submit" id = "submit" value = Comment>
+				</form>
+			</td>
+			<td>
+				{{line.likeCount}}
 
 
-			{% if line.ifLiked == 1 %}
-			<form action="/unlike/{{line.photoID}}" method="POST" id = "unliker">
-				<input type="submit" style="color:red" id = "submit" value = Unlike>
-			</form>
-			{% else %}
-			<form action="/like/{{line.photoID}}" method="POST" id = "liker">
-				<input type="submit" id = "submit" value = Like>
-			</form>
-			{% endif %}
-		</td>
-	</tr>
+				{% if line.ifLiked == 1 %}
+				<form action="/unlike/{{line.photoID}}" method="POST" id = "unliker">
+					<input type="submit" style="color:red" id = "submit" value = Unlike>
+				</form>
+				{% else %}
+				<form action="/like/{{line.photoID}}" method="POST" id = "liker">
+					<input type="submit" id = "submit" value = Like>
+				</form>
+				{% endif %}
+			</td>
+		</tr>
 
 
-{% endfor %}
+	{% endfor %}
 
 
 </table>
