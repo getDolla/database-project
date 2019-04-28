@@ -417,6 +417,10 @@ def close_group(group,group_owner):
     print(group,group_owner)
     cursor = conn.cursor()
 
+    #kill photos shared to group
+    query = "DELETE FROM Share WHERE `groupName` = %s AND `groupOwner` = %s";
+    cursor.execute(query, (group, group_owner))
+
     #remove everyone from the group
     query = "DELETE FROM belong WHERE `groupName` = %s AND `groupOwner` = %s;"
     cursor.execute(query, (group,group_owner))
@@ -424,6 +428,7 @@ def close_group(group,group_owner):
     #kill the group
     query = "DELETE FROM closefriendgroup WHERE `groupName` = %s AND `groupOwner` = %s;"
     cursor.execute(query, (group,group_owner))
+
     cursor.close()
     return redirect(url_for('group'))
 
