@@ -27,6 +27,22 @@ Who would you like to add to which group?
 </form>
 <br />
 
+<div> Groups pending: </div>
+<table>
+  <td> Group name:</td>
+  <td> Group owner: </td>
+  {% for group in pending %}
+		<tr>
+			<td>{{group.groupName}}</td>
+      <td>{{group.groupOwner}}</td>
+      <td> <a href = "/accept_group/{{ group.groupName }}/{{group.groupOwner}}"> Accept </td>
+      <td> <a href = "/decline_group/{{ group.groupName }}/{{group.groupOwner}}"> Decline </td>
+		</tr>
+	{% endfor %}
+</table>
+
+<hr />
+
 <div> Groups you belong in:</div>
 <table>
   <td> Group name:</td>

@@ -110,7 +110,7 @@ def home():
     cursor.execute(query)
     commentsData = cursor.fetchall()
     #all groups user can post too
-    query = 'SELECT * FROM Belong WHERE username = %s'
+    query = 'SELECT * FROM Belong WHERE username = %s AND accepted = 1'
     cursor.execute(query, (user))
     groups = cursor.fetchall()
     length = [ i for i in range(len(groups)) ]
@@ -324,11 +324,16 @@ def followee_unfollow(follower):
 def group():
     user = session['username']
     cursor = conn.cursor()
-    query = 'SELECT groupName, groupOwner FROM Belong WHERE username = %s'
+    query = 'SELECT groupName, groupOwner, accepted FROM Belong WHERE username = %s and accepted = True'
     cursor.execute(query, (user))
     data = cursor.fetchall()
+
+    pendingQry = 'SELECT groupName, groupOwner, accepted FROM Belong WHERE username = %s and accepted = False'
+    cursor.execute(pendingQry,(user))
+    pendingdata = cursor.fetchall()
+
     cursor.close()
-    return render_template('group.html', request = data)
+    return render_template('group.html', request = data, pending = pendingdata)
 
 @app.route('/create_group',  methods = ["GET", "POST"])
 def create_group():
@@ -347,7 +352,7 @@ def create_group():
         #create a group if user does not currently own a group
         query = 'INSERT INTO closefriendgroup (groupName, groupOwner) VALUES (%s,%s);'
         cursor.execute(query, (group_name, user))
-        query = 'INSERT INTO belong (groupName, groupOwner, username) VALUES (%s,%s,%s);'
+        query = 'INSERT INTO belong (groupName, groupOwner, username, accepted) VALUES (%s,%s,%s, True);'
         cursor.execute(query, (group_name, user, user))
 
         #double check was removed
@@ -361,7 +366,7 @@ def manage_group(group,group_owner):
     user = session['username']
     groupName = group
     cursor = conn.cursor()
-    query = "SELECT groupName, groupOwner, username FROM belong WHERE groupName = %s and groupOwner = %s"
+    query = "SELECT groupName, groupOwner, username FROM belong WHERE groupName = %s and groupOwner = %s and accepted = True"
     cursor.execute(query, (group,group_owner))
     data = cursor.fetchall()
     cursor.close()
@@ -381,6 +386,27 @@ def kick_member(group,username):
     data = cursor.fetchall()
     cursor.close()
     return render_template('manage_groups.html', data = data)
+
+
+@app.route('/accept_group/<group>/<group_owner>')
+def accept_group(group,group_owner):
+    user = session['username']
+    cursor = conn.cursor()
+    query = 'UPDATE belong SET accepted = True WHERE groupName = %s AND groupOwner = %s AND username = %s;'
+    cursor.execute(query, (group,group_owner,user))
+    conn.commit()
+    cursor.close()
+    return redirect(url_for('group'))
+
+@app.route('/decline_group/<group>/<group_owner>')
+def decline_group(group, group_owner):
+    user = session['username']
+    cursor = conn.cursor()
+    query = 'DELETE FROM belong WHERE groupName = %s AND groupOwner = %s AND username = %s;'
+    cursor.execute(query, (group,group_owner,user))
+    conn.commit()
+    cursor.close()
+    return redirect(url_for('group'))
 
 @app.route('/leave_group/<group>/<group_owner>')
 def leave_group(group,group_owner):
@@ -430,7 +456,7 @@ def add_friend():
             cursor.execute(query,(to_add))
             data = cursor.fetchall()
             if data[0]['count'] == 1:
-                query = 'INSERT INTO belong (groupName, groupOwner, username) VALUES (%s,%s,%s);'
+                query = 'INSERT INTO belong (groupName, groupOwner, username, accepted) VALUES (%s,%s,%s, False);'
                 cursor.execute(query, (group_name, user, to_add))
                 conn.commit()
             else:
