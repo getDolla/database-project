@@ -48,6 +48,7 @@
 
 <a href = "/follow">Manage Follows</a> <br />
 <a href = "/group">Manage Groups</a> <br />
+<a href="/search_tag">Search Tags</a><br>
 Here are your posts:
 
 <table>
@@ -59,7 +60,7 @@ Here are your posts:
 	<th>Caption</th>
 	<th>Tagged</th>
 	<th>Comment</th>
-	<th>Like</th>
+	<th>Likes</th>
 
 
 {% for line in posts %}
@@ -70,12 +71,12 @@ Here are your posts:
 		<td>{{line.photoID}}</td>
 		<td>
 			{% if line.allFollowers == 1 %}
-			"All Followers"
+			All Followers
 			<br />
 			{% endif %}
 			{% for group in viewableGroups %}
 				{% if group.photoID == line.photoID %}
-					"{{group.groupName}}"
+					{{group.groupName}}
 					<br />
 				{% endif %}
 			{% endfor %}
@@ -91,11 +92,10 @@ Here are your posts:
 			{% if tag.photoID == line.photoID %}
 
 			{{tag.username}}
-			<br />
+			<br>
 
 			{% endif %}
 			{% endfor %}
-			<br>
 			<a href = "/tag/{{ line.photoID }}">Tag</a>
 		</td>
 		<td>
@@ -133,8 +133,6 @@ Here are your posts:
 
 
 </table>
-
-<a href="/select_blogger">Select a blogger</a>
 <br>
 <a href="/logout">Logout</a>
 

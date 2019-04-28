@@ -126,7 +126,7 @@ def home():
     viewableGroups = cursor.fetchall()
 
     cursor.close()
-    return render_template('home.html', username=user, posts=data, group = groups, length = length, comments = commentsData, tags = tags,viewableGroups=viewableGroups)
+    return render_template('home.html', username=user, posts=data, group = groups, length = length, comments = commentsData, tags = tags, viewableGroups=viewableGroups)
 
 
 @app.route('/post', methods=['GET', 'POST'])
@@ -225,7 +225,7 @@ def send_follow():
     username = session['username']
     toFollow = request.form['toFollow']
     cursor = conn.cursor()
-    #prior to following, followee msut exist - will need to check
+    #prior to following, followee must exist - will need to check
     query = 'SELECT Count(*) as count FROM Person WHERE username = %s;'
     cursor.execute(query, (toFollow))
     data = cursor.fetchall()
@@ -476,18 +476,37 @@ def add_tag():
     username = session["username"]
     tagee = request.form["toTag"]
     photoID = request.form["photoID"]
-    cursor = conn.cursor();
+    cursor = conn.cursor()
 
     #check if user you are adding is already being tagged
     query = 'SELECT Count(*) as count FROM Tag WHERE username = %s AND photoID = %s;'
     cursor.execute(query, (tagee, photoID))
     data = cursor.fetchall()
-    print(data)
+    # print(data)
     if data[0]['count'] == 0:
-        added = True if username == tagee else False
-        query = 'INSERT INTO Tag(username, photoID, acceptedTag) VALUES (%s, %s, %s);'
-        cursor.execute(query, (tagee, photoID, added))
-        conn.commit()
+        query = 'SELECT Count(*) as count FROM Person WHERE username = %s;'
+        cursor.execute(query, (tagee))
+        data = cursor.fetchall()
+        if data[0]['count'] == 0:
+            flash(tagee + " does not exist")
+        else:
+            if username == tagee:
+                query = 'INSERT INTO Tag(username, photoID, acceptedTag) VALUES (%s, %s, %s);'
+                cursor.execute(query, (tagee, photoID, True))
+                conn.commit()
+            else:
+                query = 'SELECT photoID FROM Photo AS p WHERE p.photoID IN (SELECT photoID FROM Belong NATURAL JOIN Share WHERE username = %s) OR (allfollowers = 1 AND EXISTS (SELECT * FROM Follow WHERE followerUsername = %s and followeeUsername = p.photoOwner)) OR (p.photoOwner = %s)'
+                cursor.execute(query, (tagee, tagee, tagee))
+                data = cursor.fetchall()
+                # print(data)
+                # print(data[0]["photoID"])
+                # print(photoID)
+                if int(photoID) == data[0]["photoID"]:
+                    query = 'INSERT INTO Tag(username, photoID, acceptedTag) VALUES (%s, %s, %s);'
+                    cursor.execute(query, (tagee, photoID, False))
+                    conn.commit()
+                else:
+                    flash("Photo " + photoID + " not visible to " + tagee)
     else:
         #to_add already in group
         flash(tagee + " is already being tagged")
@@ -513,33 +532,30 @@ def reject_tag(tagee, photoID):
     return redirect(url_for('tag', photoID = photoID))
 
 @app.route('/search_tag')
-def search_tag(user = session["username"], data = [], comments = [], likes = [], tages = [], viewableGroups = []):
-    return render_template('search_tag.html', username=user, posts=data, comments = commentsData, likes = likes, tags = tags, viewableGroups=viewableGroups)
+def search_tag():
+    return render_template('search_tag.html', username=session['username'], posts=[], comments = [], tags = [], viewableGroups=[])
 
-@app.route('/get_tag')
+@app.route('/get_tag', methods = ["GET", "POST"])
 def get_tag():
     user = session['username']
     tag = request.form["tag_name"]
     cursor = conn.cursor()
 
-    
-
-    query = 'SELECT * FROM Photo NATURAL JOIN Tag WHERE username = %s AND photoID IN (SELECT photoID FROM Photo AS p WHERE p.photoID IN (SELECT photoID FROM Belong NATURAL JOIN Share WHERE username = %s) OR (allfollowers = 1 AND EXISTS (SELECT * FROM Follow WHERE followerUsername = %s and followeeUsername = p.photoOwner)) OR (p.photoOwner = %s) ORDER BY timestamp DESC)'
-    cursor.execute(query, (tag, user, user, user))
+    query = 'SELECT Count(*) as count FROM Tag WHERE username = %s;'
+    cursor.execute(query, (tag))
     data = cursor.fetchall()
+    print(data)
+    if data[0]['count'] == 0:
+        flash("Tag: " + tag + " does not exist!")
+        return redirect(url_for('search_tag'))
 
-    query = "SELECT photoID, Count(*) AS count FROM Liked GROUP BY photoID"
-    cursor.execute(query)
-    likes = cursor.fetchall()
+    query = 'SELECT * FROM (SELECT temp1.photoID, photoOwner, timestamp, filePath, caption, allFollowers, likeCount, ifLiked FROM ((SELECT * FROM Photo AS p WHERE p.photoID IN (SELECT photoID FROM Belong b NATURAL JOIN Share WHERE username = %s) OR (allfollowers = 1 AND EXISTS (SELECT * FROM Follow WHERE followerUsername = %s and followeeUsername = p.photoOwner)) OR (p.photoOwner = %s)) AS temp1 LEFT JOIN (SELECT l.photoID, l.likeCount, r.ifLiked FROM (SELECT photoID, count(*) AS likeCount FROM Liked GROUP BY photoID) AS l LEFT JOIN (SELECT photoID, True AS ifLiked FROM Liked WHERE username = %s) AS r ON (l.photoID = r.photoID)) AS temp2 ON (temp1.photoID = temp2.photoID))) as temp NATURAL JOIN Tag as t WHERE t.username = %s ORDER BY timestamp DESC;'
+    cursor.execute(query, (user, user, user, user, tag))
+    data = cursor.fetchall()
 
     query = 'SELECT username, photoID, commentText, timestamp FROM Comment ORDER BY timestamp ASC'
     cursor.execute(query)
     commentsData = cursor.fetchall()
-    #all groups user can post too
-    query = 'SELECT * FROM Belong WHERE username = %s AND accepted = 1'
-    cursor.execute(query, (user))
-    groups = cursor.fetchall()
-    length = [ i for i in range(len(groups)) ]
 
     #prob needs to be fixed
     query = "SELECT * FROM Tag WHERE acceptedTag = 1;"
@@ -552,7 +568,7 @@ def get_tag():
     viewableGroups = cursor.fetchall()
 
     cursor.close()
-    return redirect(url_for('search_tag', user = user, data = [], comments = [], likes = [], tages = [], viewableGroups = []))
+    return render_template('search_tag.html', username=user, posts=data, comments = commentsData, tags = tags, viewableGroups=viewableGroups)
 
 @app.route('/logout')
 def logout():
