@@ -124,8 +124,8 @@ def home():
     viewableGroups = cursor.fetchall()
 
     #prob needs to be fixed
-    query = "SELECT * FROM Tag WHERE photoID IN (SELECT photoID FROM Photo WHERE photoOwner = %s) AND acceptedTag = 1;"
-    cursor.execute(query, (user))
+    query = "SELECT * FROM Tag WHERE acceptedTag = 1;"
+    cursor.execute(query)
     tags = cursor.fetchall()
 
     cursor.close()
@@ -436,9 +436,10 @@ def tag(photoID):
     query = 'SELECT filePath FROM Photo WHERE photoID = %s;'
     cursor.execute(query, (photoID))
     filePath = cursor.fetchall()[0]["filePath"]
-    query = 'SELECT * FROM Tag WHERE username = %s AND acceptedTag <> 1;'
+    query = 'SELECT * FROM Tag NATURAL JOIN Photo WHERE username = %s AND acceptedTag <> 1;'
     cursor.execute(query, (session["username"]))
     data = cursor.fetchall()
+    # print(data)
     return render_template("add_tag.html", photoID = photoID, filePath = filePath, requests = data)
 
 

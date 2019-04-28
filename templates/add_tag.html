@@ -25,9 +25,9 @@ Who would you like to tag in this photo (ID: {{ photoID }})? <br>
 
 <div> Pending Requests </div>
 <table>
-	{% for tagee in requests[0] %}
+	{% for tagee in requests %}
 		<tr>
-			<td>{{ tagee.username }} on photo {{ photoID }}</td>
+			<td>{{ tagee.username }} on photo {{ tagee.photoID }} by {{ tagee.photoOwner }}</td>
 			<td><a href="/accept_tag/{{ tagee.username }}/{{ photoID }}">Accept</a></td>
 			<td><a href="/reject_tag/{{ tagee.username }}/{{ photoID }}">Reject</a></td>
 		</tr>
