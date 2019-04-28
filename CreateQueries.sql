@@ -40,6 +40,7 @@ CREATE TABLE Belong(
     groupName VARCHAR(20),
     groupOwner VARCHAR(20),
     username VARCHAR(20),
+    accepted BOOLEAN,
     PRIMARY KEY (groupName, groupOwner, username),
     FOREIGN KEY (groupName, groupOwner) REFERENCES CloseFriendGroup(groupName, groupOwner),
     FOREIGN KEY (username) REFERENCES Person(username)
