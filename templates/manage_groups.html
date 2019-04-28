@@ -1,10 +1,10 @@
 <html>
 <head>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = ('css/bootstrap.min.css') ) }}">
+	<title>Manage Groups</title>
 </head>
-<body>
-
-<button onclick="location.href='/group'" type="button"> Back </button>
-<br />
+<body style="margin-left: 2%; margin-right: 2%;">
+<button onclick="location.href='/home'" type="button" class="btn btn-sm"> Back </button> <br><br>
 
 {% with messages = get_flashed_messages() %}
   {% if messages %}
@@ -19,7 +19,7 @@
 <font size="+1"><u>Group Name:</font></u> {{data[0].groupName}}
 <br />
 <font size="+1"><u>Members:</font></u>
-<table>
+<table class="table table-sm" style="width: 70%;">
   {% for group in data %}
   <tr>
       <td> {{group.username}} </td>
@@ -41,6 +41,6 @@
 {% endif %}
 
 </br>
-<font size="+1"><u>You are logged in as:</font></u> {{session['username']}}
+You are logged in as: {{session['username']}}
 </body>
 </html>

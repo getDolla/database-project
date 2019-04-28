@@ -1,15 +1,16 @@
 <html>
 <head>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = ('css/bootstrap.min.css') ) }}">
+	<title>Manage Follows</title>
 </head>
-<body>
+<body style="text-align: center;">
 
-<button onclick="location.href='/home'" type="button"> Back </button>
-<br />
+<button onclick="location.href='/home'" type="button" class="btn btn-sm"> Back </button> <br><br>
 
-<font size="+1"><u>Who would you like to follow:</font></u>
+<font size="+1">Who would you like to follow:</font>
 <form action="/send_follow" method="POST">
 	<input type="text" name = "toFollow" placeholder="username" required/> <br>
-	<input type="submit" value = 'Send Request' />
+	<input type="submit" value = 'Send Request' class="btn btn-sm" />
 </form>
 <br />
 
@@ -44,6 +45,8 @@
 		</tr>
 	{% endfor %}
 </table>
+
+<br>
 
 <div> <font size="+1"><u>Followers:</font></u></div>
 <table>

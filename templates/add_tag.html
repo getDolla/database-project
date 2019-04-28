@@ -1,17 +1,19 @@
 <html>
 <head>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = ('css/bootstrap.min.css') ) }}">
+	<title>Add Tag</title>
 </head>
-<body>
+<body style="text-align: center;">
 
-<button onclick="location.href='/home'" type="button"> Back </button>
-<br />
+<button onclick="location.href='/home'" type="button" class="btn btn-sm"> Back </button>
+<br /><br>
 
 <font size="+1"><u>Who would you like to tag in this photo (ID: {{ photoID }})?</u> </font><br><br>
 <img src="{{ url_for('static', filename = ('uploads/' + filePath) ) }}" alt="Image" style="max-height: 1000px; max-width: 1000px;">
 <br><br>
 <form action="/add_tag" method="POST">
-	<input type="text" name = "toTag" placeholder="username" required/> <br>
-	<input type="submit" value = 'Send Request' />
+	<input type="text" name = "toTag" placeholder="username" required/> <br><br>
+	<input type="submit" value = 'Send Request' class="btn btn-sm" />
 	<input type="hidden" name = "photoID" value="{{ photoID }}">
 </form>
 <br>

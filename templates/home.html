@@ -1,10 +1,12 @@
 <html>
 <head>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = ('css/bootstrap.min.css') ) }}">
+	<title>Homepage</title>
 </head>
-<body>
+<body style="margin-left: 2%; margin-right: 2%;">
 <form action="/post" method="POST" enctype="multipart/form-data" id = "post_form">
 	<h1>Welcome {{username}}</h1>
-	<input type="file" name="pic" accept="image/*" required> </br>
+	<input type="file" name="pic" accept="image/*" class="btn btn-sm" required> </br>
 	<input type="text" name="caption" placeholder="Caption"> <br>
 	<input type="radio" name="allFollowers" value="true" onclick="check()" required id = "follower"> Visible to All Followers<br>
   <input type="radio" name="allFollowers" value="false" id="group" onclick="check()"> Visible to Selected Groups:<br>
@@ -37,7 +39,7 @@
 			return groupChecked;
 		};
 	</script>
-	<input type="submit" id = "submit" value = Post onclick="return validate()"/>
+	<input type="submit" id = "submit" value = Post  class="btn btn-sm" onclick="return validate()"/>
 </form>
 
 <style type="text/css">
@@ -48,19 +50,23 @@
 
 <a href = "/follow">Manage Follows</a> <br />
 <a href = "/group">Manage Groups</a> <br />
-<a href="/search_tag">Search Tags</a><br>
-Here are your posts:
+<a href="/search_tag">Search By Tag</a><br><br>
+Here's your feed:
 
-<table>
-	<th>Time</th>
-	<th>Creator</th>
-	<th>Post ID</th>
-	<th>Groups</th>
-	<th>Post</th>
-	<th>Caption</th>
-	<th>Tagged</th>
-	<th>Comment</th>
-	<th>Likes</th>
+<table class="table table-sm">
+	<thead class="thead-dark">
+		<tr>
+		<th>Time</th>
+		<th>Creator</th>
+		<th>Post ID</th>
+		<th>Groups</th>
+		<th>Post</th>
+		<th>Caption</th>
+		<th>Tagged</th>
+		<th>Comment</th>
+		<th>Likes</th>
+	</tr>
+</thead>
 
 
 {% for line in posts %}
@@ -96,7 +102,7 @@ Here are your posts:
 
 			{% endif %}
 			{% endfor %}
-			<a href = "/tag/{{ line.photoID }}">Tag</a>
+			<button onclick="location.href='/tag/{{ line.photoID }}'" type="button" class="btn btn-sm"> Tag </button>
 		</td>
 		<td>
 			<form action="/comment/{{line.photoID}}" method="POST" id = "commenter">
@@ -109,7 +115,7 @@ Here are your posts:
 				{% endif %}
 				{% endfor %}
 				<input type="text" name="myComment" required> <br>
-				<input type="submit" id = "submit" value = Comment>
+				<input type="submit" id = "submit" value = Comment class="btn btn-sm">
 			</form>
 		</td>
 		<td>
@@ -118,11 +124,11 @@ Here are your posts:
 
 			{% if line.ifLiked == 1 %}
 			<form action="/unlike/{{line.photoID}}" method="POST" id = "unliker">
-				<input type="submit" style="color:red" id = "submit" value = Unlike>
+				<input type="submit" style="color:red" id = "submit" value = Unlike class="btn btn-sm">
 			</form>
 			{% else %}
 			<form action="/like/{{line.photoID}}" method="POST" id = "liker">
-				<input type="submit" id = "submit" value = Like>
+				<input type="submit" id = "submit" value = Like class="btn btn-sm">
 			</form>
 			{% endif %}
 		</td>
@@ -134,8 +140,9 @@ Here are your posts:
 
 </table>
 <br>
-<a href="/logout">Logout</a>
-
+<button onclick="location.href='/logout'" type="button" class="btn btn-sm btn-info"> Logout </button>
+<br>
+<br>
 </body>
 
 

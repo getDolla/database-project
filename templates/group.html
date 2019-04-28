@@ -1,7 +1,9 @@
 <html>
 <head>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = ('css/bootstrap.min.css') ) }}">
+	<title>Groups</title>
 </head>
-<body>
+<body style="margin-left: 2%; margin-right: 2%;">
 
 {% with messages = get_flashed_messages() %}
   {% if messages %}
@@ -13,28 +15,28 @@
   {% endif %}
 {% endwith %}
 
-<button onclick="location.href='/home'" type="button"> Back </button>
+<button onclick="location.href='/home'" type="button" class="btn btn-sm"> Back </button> <br><br>
 
-<br /><br>
-
-<font size="+1"><u>Create group:</font></u>
+<font size="+1">Create group:</font>
 <form action = "/create_group" method = "POST">
   <input type="text" name = "createGroup" placeholder="Group Name" required/> </br>
-	<input type="submit" value = 'Create' />
+	<input type="submit" value = 'Create' class="btn btn-sm" />
 </form>
 
-<font size="+1"><u>Who would you like to add to which group:</font></u>
+<br>
+
+<font size="+1">Who would you like to add to which group:</font>
 <form action="/add_friend" method="POST">
   <input type="text" name = "group_name" placeholder="group name" required/> <br>
 	<input type="text" name = "toAdd" placeholder="username" required/> </br>
-	<input type="submit" value = 'Send Request' />
+	<input type="submit" value = 'Send Request' class="btn btn-sm"/>
 </form>
 <br />
 
 <div> <font size="+1"><u>Pending Group Requests:</font></u> </div>
-<table>
-  <td> <div><u>Group name:</u></td>
-  <td> <div><u>Group owner:</u> </td>
+<table class="table table-sm">
+  <td> <div>Group name:</td>
+  <td> <div>Group owner:</td>
   {% for group in pending %}
 		<tr>
 			<td>{{group.groupName}}</td>
@@ -48,9 +50,9 @@
 <hr />
 
 <div> <font size="+1"><u>Groups you belong in:</font></u></div>
-<table>
-  <td><u>Group name:</u></td>
-  <td><u>Group owner:</u> </td>
+<table class="table table-sm">
+  <td>Group name:</td>
+  <td>Group owner:</td>
   {% for group in request %}
 		<tr>
 			<td>{{group.groupName}}</td>
