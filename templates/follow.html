@@ -37,7 +37,7 @@ Who would you like to follow?
 <table>
 	{% for followee in requests[1] %}
 		<tr>
-			<td>{{followee.followerUsername}}</td>
+			<td>{{followee.followeeUsername}}</td>
 			<td><a href="/follower_unfollow/{{ followee.followeeUsername }}">Unfollow</a></td>
 		</tr>
 	{% endfor %}
