@@ -501,7 +501,7 @@ def add_tag():
                 # print(data)
                 # print(data[0]["photoID"])
                 # print(photoID)
-                if int(photoID) == data[0]["photoID"]:
+                if len(data) > 0 and int(photoID) == data[0]["photoID"]:
                     query = 'INSERT INTO Tag(username, photoID, acceptedTag) VALUES (%s, %s, %s);'
                     cursor.execute(query, (tagee, photoID, False))
                     conn.commit()
