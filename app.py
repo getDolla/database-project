@@ -234,7 +234,7 @@ def send_follow():
         cursor.execute(query, (username, toFollow))
         data = cursor.fetchall()
         if data[0]['count'] == 1:
-            flash("You're already following " + toFollow)
+            flash("You're already following or your request has not accepted by " + toFollow)
         else:
             query  = "INSERT INTO `follow`(`followerUsername`, `followeeUsername`, `acceptedfollow`) VALUES (%s,%s,%s)"
             #print(request.form['toFollow'])
